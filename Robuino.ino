@@ -7,6 +7,8 @@ Odometrie odotest;
 Kommunikation komTest;
 
 // Änderung
+
+// �nderung aus anderem Projekt
 // Änderung online
 
 void setup()
