@@ -19,6 +19,17 @@ Odometrie::Odometrie() {
 
 }
 
+/*
+ * Funktion setPosition() aktualisiert die Positionsdaten aus der Odometrie
+ * mit den Daten aus dem Positionsbestimmungsteam
+ */
+void Odometrie::setPosition() {
+	Kommunikation Check;
+	if (Check.getSignalUsefull()) {// Abfrage, ob Signal ok ist, Schutz vor Missbrauch der Methode
+		Check.getPosition(x_odometrie, y_odometrie);
+	}
+}
+
 void Odometrie::updateOdometrie() {
 
 	// Variablen
@@ -34,11 +45,12 @@ void Odometrie::updateOdometrie() {
 
 	// Veränderungen der x und y Position des Fahrzeugs
 	// Updaten der Attribute
-	x_odometrie = d_center * cos((alpha_odometrie*PI)/180);
-	y_odometrie = d_center * sin((alpha_odometrie*PI)/180);
+	x_odometrie = d_center * cos((alpha_odometrie * PI) / 180);
+	y_odometrie = d_center * sin((alpha_odometrie * PI) / 180);
 
 	//Winkel des Fahrzeugs berechnen und Attribute updaten
-	alpha_odometrie += (-1.0 * (leftWheelChange + rightWheelChange) * 180) / (Achsabstand * PI);
+	alpha_odometrie += (-1.0 * (leftWheelChange + rightWheelChange) * 180)
+			/ (Achsabstand * PI);
 }
 
 float Odometrie::getAngle() {
@@ -141,35 +153,37 @@ void Odometrie::testRotary() {
 
 }
 
-void Odometrie::testBerechnung(float diffLeft[], float diffRight[], int arraySize) {
+void Odometrie::testBerechnung(float diffLeft[], float diffRight[],
+		int arraySize) {
 
 	float d_center = 0; // relative Bewegung der Mitte des Roboters
 
 	int i = 0;
-	for(i = 0; i < arraySize; i++){
+	for (i = 0; i < arraySize; i++) {
 
-	// Bewegung, Differenz in der Position des Fahrzeuges berechnen
-	d_center = (diffRight[i] - diffLeft[i]) / 2;
+		// Bewegung, Differenz in der Position des Fahrzeuges berechnen
+		d_center = (diffRight[i] - diffLeft[i]) / 2;
 
-	// Veränderungen der x und y Position des Fahrzeugs
-	// Updaten der Attribute
-	x_odometrie += d_center * cos((alpha_odometrie*PI)/180);
-	y_odometrie += d_center * sin((alpha_odometrie*PI)/180);
+		// Veränderungen der x und y Position des Fahrzeugs
+		// Updaten der Attribute
+		x_odometrie += d_center * cos((alpha_odometrie * PI) / 180);
+		y_odometrie += d_center * sin((alpha_odometrie * PI) / 180);
 
-	//Winkel des Fahrzeugs berechnen und Attribute updaten
-	alpha_odometrie += (-1.0 *(diffLeft[i] + diffRight[i]) * 180 )/ (Achsabstand * PI);
+		//Winkel des Fahrzeugs berechnen und Attribute updaten
+		alpha_odometrie += (-1.0 * (diffLeft[i] + diffRight[i]) * 180)
+				/ (Achsabstand * PI);
 
-	// Alles ausgeben und mal schauen wie es so aussieht
-	Serial.print("x_Pos: ");
-	Serial.print(x_odometrie);
-	Serial.print(", ");
-	Serial.print("y_Pos: ");
-	Serial.print(y_odometrie);
-	Serial.print(", ");
-	Serial.print("Alpha: ");
-	Serial.print(alpha_odometrie);
-	Serial.println();
-	Serial.println();
+		// Alles ausgeben und mal schauen wie es so aussieht
+		Serial.print("x_Pos: ");
+		Serial.print(x_odometrie);
+		Serial.print(", ");
+		Serial.print("y_Pos: ");
+		Serial.print(y_odometrie);
+		Serial.print(", ");
+		Serial.print("Alpha: ");
+		Serial.print(alpha_odometrie);
+		Serial.println();
+		Serial.println();
 
 	}
 }

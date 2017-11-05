@@ -63,8 +63,8 @@ void Kommunikation::DataToHardware(String comString) {
 }
 
 /*
- * Fragt die Daten über den ii^2 Bus von der Positions Gruppe an
- * i^2c Methode
+ * Fragt die Daten über den i2c Bus von der Positions Gruppe an
+ * i2c Methode
  */
 void Kommunikation::DataFromPosition(String& comString) {
 
@@ -107,6 +107,33 @@ bool Kommunikation::getStopEnemy() {
 
 	//Daten in den Json String schreiben
 	result = root["enDet"];
+
+	// Return des Ergebnisses
+	return result;
+
+}
+
+/*
+ *	Gibt einen Bool zurück, wenn das Signal des Positionsbestimmungsteams gut ist.
+ *  Wird in den Funktionen genutzt, um Daten zu aktualisieren und zu kalibrieren
+ */
+
+bool Kommunikation::getSignalUsefull(){
+	// Buffer für den Json String
+	StaticJsonBuffer<100> jsonBuffer;
+
+	// Variablen
+	bool result = false;
+	String comString;
+
+	// Daten von dem Positions-Team abfragen
+	DataFromPosition(comString);
+
+	// Einen Json String erstellen
+	JsonObject& root = jsonBuffer.parseObject(comString);
+
+	//Daten in den Json String schreiben
+	result = root["sigOk"];
 
 	// Return des Ergebnisses
 	return result;
@@ -191,7 +218,6 @@ void Kommunikation::testAsMaster() {
 
 	// Json Object aus dem übergebenen string erstellen
 	JsonObject& root = jsonBuffer.parseObject(comString);
-
 	// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
 	float left = root["left"];
 	float right = root["right"];
@@ -218,32 +244,3 @@ void Kommunikation::testAsSlave() {
 	Wire.onRequest(send);
 
 }
-
-/*
-
- bool Kommunikation::getSignalOk() {
- }
-
-
- int Kommunikation::getX_position() {
- getX_position();
- }
-
- //
- int Kommunikation::getY_position() {
-
- }
-
- void Kommunikation::DatenAnHardware(int linkesRad, int rechtesRad,
- bool notHalt) {
- getY_position();
- }
-
- void Kommunikation::DatenVonPosition() {
-
- }
-
- bool Kommunikation::getNotHalt() {
-
- }
- */

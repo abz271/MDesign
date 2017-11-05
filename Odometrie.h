@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "Kommunikation.h"
 
 
 #ifndef ODOMETRIE_H
@@ -8,17 +9,13 @@ class Odometrie {
 private:
 
 	// Geometrie des Fahrzeugs
-    //const int breite = 10; // Breite des Autos in "mm"
-    //const int hoehe = 10; // Hoehe des Autos in "mm"
     float Achsabstand = 200;	// in mm
 
-
 	// Position
-    float x_odometrie = 0;
-    float y_odometrie = 0;
-    float alpha_odometrie = 0;
+    float x_odometrie;
+    float y_odometrie;
+    float alpha_odometrie;
 
-    //float odometrie_offset = 0.5;
 
     // Rad Geometrie
     const float radDurchmesser = 50.0;
@@ -31,12 +28,14 @@ private:
 
 public:
 
-    // Nach auﬂen gebracuhte Methoden
+    // Nach auﬂen gebrauchte Methoden
     Odometrie();
     void updateOdometrie();
+    void setPosition();
     float getX_position();
     float getY_position();
     float getAngle();
+
 
     // Test Methoden
     void testRotary();
@@ -47,6 +46,7 @@ public:
 };
 
 #endif /* ODOMETRIE_H */
+
 
 
 

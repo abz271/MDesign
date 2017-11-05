@@ -10,34 +10,47 @@ private:
     Kommunikation JSON;
     Odometrie Odo;
 private:
-    int Beschleunigung = 10000;
-    bool nothalt;
-    
-    bool master = true;
-    
-    int X_Koordinaten[10] = {0, 10, 15, 20, 25};
-    int Y_Koordinaten[10] = {100, 25, 10, 5, 9};
-    int x_aktuell = 200; // Startwert in x-Richtung
-    int y_aktuell = 200; // Startwert in y-Richtung
 
-    int KoordinatenAnfahren;
-    float ZielpunktOffset = 10;
+    // Attribute für die Motoransteuerung
+    int stopp = 0;
+    float forward = 1;
+    float backward = 1;
+    float TargetAngle = 0;
+
+    // Attribute für die Positionsbestimmung
+    int X_Koordinaten[5] = {0, 10, 15, 20, 25};
+    int Y_Koordinaten[5] = {100, 25, 10, 5, 9};
+    float x_aktuell = 0; // Startwert in x-Richtung
+    float y_aktuell = 0; // Startwert in y-Richtung
+    int Position = 0;	// Aktueller Anfahrpunkt
+    int MaxPositions = 5;	// Maximal anfahrbare Punkt
+
+
+    // Attribute für das Ausweichverhalten
+    bool Master = true;
+    int Spielfeldbreite = 3000;
+    int Spielfeldhoehe = 2000;
+    int autobreite = 200;
+    float AvoidAngle = 0;
+
     
-public:
+private:
+
     Navigation();
-    void warte();
-    void DrehungUmPunkt();
-    void GeradeAusFahren();
-    void naechestePosition();
-    double weglaenge(int x, int y);
-    double winkelBerechnen(int x, int y);
-    void PositionBestimmen();
-    int getAktuellesX();
-    int getAktuellesY();
-    int getTargetX();
-    int getTargetY();
-    float getWinkelOdo();
-    float getTargetOffset();
+
+
+
+    double weglaenge(int x, int y);	// wird evtl nicht mehr gebraucht, erstmal dabei gelassen
+    double CalculateAngle(int x, int y);
+
+    void UpdateData();
+    void StartDriving();
+    void DriveStraightForward();
+    void StopDriving();
+    void Rotate();
+    void AvoidClash();
+    void nextPosition();
+
 };
 
 #endif /* NAVIGATION_H */
