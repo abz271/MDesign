@@ -8,6 +8,7 @@ Kommunikation komTest;
 
 // Änderung offline
 
+
 void setup()
 {
 // Add your initialization code here
