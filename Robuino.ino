@@ -6,10 +6,7 @@
 Odometrie odotest;
 Kommunikation komTest;
 
-// Änderung
-
-// �nderung aus anderem Projekt
-// Änderung online
+// Git änderung
 
 void setup()
 {
