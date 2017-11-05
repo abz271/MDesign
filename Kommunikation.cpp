@@ -118,7 +118,7 @@ bool Kommunikation::getStopEnemy() {
  *  Wird in den Funktionen genutzt, um Daten zu aktualisieren und zu kalibrieren
  */
 
-bool Kommunikation::getSignalUsefull(){
+bool Kommunikation::getSignalUsefull() {
 	// Buffer für den Json String
 	StaticJsonBuffer<100> jsonBuffer;
 
@@ -198,34 +198,49 @@ void Kommunikation::sendMotorPower(float leftWheelPower,
  */
 void Kommunikation::testAsMaster() {
 
-	String comString;
+	static unsigned long mili = millis();
 
-	Wire.requestFrom(5, 50);
+	if (millis() > (mili + 1500)) {
 
-	// Char array anlegen
-	char c = 0;
+		static int number = 0;
+		Serial.print("Abfrage ");
+		Serial.print(number);
+		Serial.print(":  ");
 
-	// Daten einlesen
-	while (Wire.available()) {
+		number++;
 
-		// Chars nacheinander empfangen und in ein char array schreiben
-		c = Wire.read();
-		comString += c;
+		String comString;
+
+		Wire.requestFrom(5, 50);
+
+		// Char array anlegen
+		char c = 0;
+
+		// Daten einlesen
+		while (Wire.available()) {
+
+			// Chars nacheinander empfangen und in ein char array schreiben
+			c = Wire.read();
+			comString += c;
+		}
+
+		// Buffer für den Json String
+		StaticJsonBuffer<100> jsonBuffer;
+
+		// Json Object aus dem übergebenen string erstellen
+		JsonObject& root = jsonBuffer.parseObject(comString);
+		// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
+
+		float left = root["left"];
+		float right = root["right"];
+
+		Serial.print(left);
+		Serial.print("   ");
+		Serial.print(right);
+		Serial.println();
+
+		mili = millis();
 	}
-
-	// Buffer für den Json String
-	StaticJsonBuffer<100> jsonBuffer;
-
-	// Json Object aus dem übergebenen string erstellen
-	JsonObject& root = jsonBuffer.parseObject(comString);
-	// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
-	float left = root["left"];
-	float right = root["right"];
-
-	Serial.print(left);
-	Serial.print("   ");
-	Serial.print(right);
-	Serial.println();
 
 }
 
