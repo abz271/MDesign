@@ -9,6 +9,10 @@ Kommunikation komTest;
 // Änderung offline
 // blabla
 
+
+// Änderung an Torbens Pc
+
+
 void setup()
 {
 // Add your initialization code here
