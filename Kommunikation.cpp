@@ -38,13 +38,14 @@ void Kommunikation::DataFromHardware(String& comString) {
 		c = Wire.read();
 		comString += c;
 	}
-
 }
 
 /*
  * Sendet sie Daten für dei Moteren an die Hardware Gruppe
  * i^2c Bus Methode
  */
+
+// TODO: Methode wird nicht mehr genutzt. Kann gelöscht werden?
 void Kommunikation::DataToHardware(String comString) {
 
 	// Char Array anlegen
@@ -162,33 +163,6 @@ void Kommunikation::getPosition(float& xPos, float& yPos) {
 	// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
 	xPos = root["xPos"];
 	yPos = root["yPos"];
-
-}
-
-/*
- * Übergibt einen Wert zwischen 0 und 1 mit wie viel Kraft/Spannung die Motoren
- * angesteuert werden sollen
- * Diese Methode kümmert sich um das Übersetzen des JSONs
- */
-void Kommunikation::sendMotorPower(float leftWheelPower,
-		float rightWheelPower) {
-
-	// Buffer für den Json String
-	StaticJsonBuffer<100> jsonBuffer;
-
-	// String für den JSON
-	String comString;
-
-	// Einen Json String erstellen
-	JsonObject& root = jsonBuffer.createObject();
-
-	//Daten in den Json String schreiben
-	root["LWP"] = leftWheelPower;
-	root["RWP"] = rightWheelPower;
-
-	root.printTo(comString);
-
-	DataToHardware(comString);
 
 }
 

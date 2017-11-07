@@ -6,7 +6,6 @@
 
 Odometrie odotest;
 Kommunikation komTest;
-
 Navigation navi;
 
 void setup()

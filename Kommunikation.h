@@ -22,7 +22,6 @@ public:
 	bool getSignalUsefull();
 	bool getStopEnemy();
 	void getPosition(float& xPos, float& yPos);
-	void sendMotorPower(float leftWheelPower, float rightWheelPower);
 
 	// Zum testen Objekt im Robi.cpp anlegen und dann
 	// diese Funktion einfach im loop laufen lassen

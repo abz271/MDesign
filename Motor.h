@@ -12,6 +12,7 @@ class Motor {
 public:
 	Motor();
 	virtual ~Motor();
+	void sendMotorPower(float leftWheelPower, float rightWheelPower);
 };
 
 #endif /* MOTOR_H_ */

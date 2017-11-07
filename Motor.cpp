@@ -16,3 +16,7 @@ Motor::~Motor() {
 	// TODO Auto-generated destructor stub
 }
 
+// Methode zur Ansteuerung der Motoren
+void Motor::sendMotorPower(float leftWheelPower, float rightWheelPower) {
+	// TODO: Motoransteuerung realisieren.
+}
