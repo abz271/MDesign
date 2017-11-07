@@ -6,8 +6,7 @@
 Odometrie odotest;
 Kommunikation komTest;
 
-// Änderung offline
-
+// Änderung offlinevhjklkjhg
 
 void setup()
 {
