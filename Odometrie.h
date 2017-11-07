@@ -31,7 +31,7 @@ public:
     // Nach auﬂen gebrauchte Methoden
     Odometrie();
     void updateOdometrie();
-    void setPosition();
+    void setPosition(int x, int y);
     float getX_position();
     float getY_position();
     float getAngle();

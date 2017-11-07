@@ -23,11 +23,10 @@ Odometrie::Odometrie() {
  * Funktion setPosition() aktualisiert die Positionsdaten aus der Odometrie
  * mit den Daten aus dem Positionsbestimmungsteam
  */
-void Odometrie::setPosition() {
-	Kommunikation Check;
-	if (Check.getSignalUsefull()) {// Abfrage, ob Signal ok ist, Schutz vor Missbrauch der Methode
-		Check.getPosition(x_odometrie, y_odometrie);
-	}
+void Odometrie::setPosition(int x, int y) {
+	x_odometrie = x;
+	y_odometrie = y;
+
 }
 
 void Odometrie::updateOdometrie() {

@@ -22,6 +22,7 @@ private:
     int Y_Koordinaten[5] = {100, 25, 10, 5, 9};
     float x_aktuell = 0; // Startwert in x-Richtung
     float y_aktuell = 0; // Startwert in y-Richtung
+    float angle_aktuell = 0; // Startwert Drehwinkel
     int Position = 0;	// Aktueller Anfahrpunkt
     int MaxPositions = 5;	// Maximal anfahrbare Punkt
 
@@ -34,6 +35,9 @@ private:
     float AvoidAngle = 0;
 
     
+    // Änderungen von Torben
+    float angleToleranz = 0.4;			// Winkelabweichung beim fahren
+
 private:
 
     Navigation();
@@ -44,12 +48,15 @@ private:
     double CalculateAngle(int x, int y);
 
     void UpdateData();
-    void StartDriving();
+    void drive();
     void DriveStraightForward();
     void StopDriving();
     void Rotate();
     void AvoidClash();
     void nextPosition();
+
+    bool finished();
+    bool atPoint();
 
 };
 

@@ -2,16 +2,12 @@
 //The setup function is called once at startup of the sketch
 #include "Kommunikation.h"
 #include "Odometrie.h"
+#include "Navigation.h"
 
 Odometrie odotest;
 Kommunikation komTest;
 
-// Änderung offline
-// blabla
-
-
-// Änderung an Torbens Pc
-
+Navigation navi;
 
 void setup()
 {
@@ -41,5 +37,8 @@ void loop()
 {
 
 	komTest.testAsMaster();
-//Add your repeated code here
+
+	// navi.drive();
+	// while(1);
+
 }
