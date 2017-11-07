@@ -6,7 +6,7 @@
 Odometrie odotest;
 Kommunikation komTest;
 
-// Änderung offline
+
 // Änderung an Torbens Pc
 
 
