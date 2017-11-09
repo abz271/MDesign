@@ -3,6 +3,10 @@
 
 #include <Arduino.h>
 
+// Allgemeine Todos
+// TODO: Timer für das automatischen Beenden der Fahrt
+// TODO: Taster implementieren, der die Fahrt beginnt.
+
 Navigation::Navigation() {
 	Position = 0;
 }
@@ -18,7 +22,7 @@ void Navigation::UpdateData() {
 		y_aktuell = Odo.getY_position();
 	}
 
-	//TODO: timer
+
 }
 
 // CalculateAngle gibt den um sich zu drehenden Winkel mit dem
@@ -30,8 +34,6 @@ double Navigation::CalculateAngle(int x, int y) {
 	double delta_y = y - y_aktuell;
 	double Winkel = atan2(delta_y, delta_x) * 180 / PI;
 
-	// TODO: Quadranten korrektur möglicherweise nötig
-
 	if ((Winkel < 180) && (Winkel > 0)) {
 
 		Winkel = (int) (((Winkel * 100 + 0.5) / 100.0) - 90);
@@ -42,8 +44,7 @@ double Navigation::CalculateAngle(int x, int y) {
 }
 
 // Berechnet die VektorlÃ¤nge zwischen dem aktuellem Standort und dem Zielpunkt.
-// TODO: Wird evtl nicht mehr gebraucht
-// TODO: automatisch von nächsten Ziel ausrechnen, aber nicht wirklich nötig
+// Wird evtl nicht mehr gebraucht
 double Navigation::weglaenge(int x, int y) {
 	int delta_x = x - x_aktuell;
 	int delta_y = y - y_aktuell;
@@ -62,14 +63,15 @@ void Navigation::Rotate() {
 	}
 }
 // Einfache Fahrt gerade aus mit gleicher Beschleunigung auf beiden Motoren
+// Sonderfall: Abweichnung um einen kleinen Winel -> Offset um gegenan zu steuern
 void Navigation::DriveStraightForward() {
 	TargetAngleNew = Odo.getAngle();	// Eingeschlagenen Winkel aktualisieren
 	// Falls das Auto im Toleranzbereich des Ursprungswinkel fährt, einfach gerade aus fahren
-	if ((TargetAngleNew <= (TargetAngleOld + angleTolerance)) || (TargetAngleNew >= (TargetAngleOld - angleTolerance))) {
+	if ((TargetAngleNew <= (ActualTargetAngle + angleTolerance)) || (TargetAngleNew >= (ActualTargetAngle - angleTolerance))) {
 		Moto.sendMotorPower(forward, forward);
-	} else if (TargetAngleNew > (TargetAngleOld + angleTolerance)) {	// falls Drehwinkel aus Odometrie zu groß wird
+	} else if (TargetAngleNew > (ActualTargetAngle + angleTolerance)) {	// falls Drehwinkel aus Odometrie zu groß wird
 		Moto.sendMotorPower((forward + driveOffset), forward);		// Fahrrichtung langsam korrigieren
-	} else if (TargetAngleNew < (TargetAngleOld - angleTolerance)) {	// falls Drehwinkel aus Odometrie zu klein wird
+	} else if (TargetAngleNew < (ActualTargetAngle - angleTolerance)) {	// falls Drehwinkel aus Odometrie zu klein wird
 		Moto.sendMotorPower(forward, (forward + driveOffset));		// Fahrrichtung langsam korrigieren
 	}
 }
@@ -79,7 +81,6 @@ void Navigation::StopDriving() {
 }
 
 void Navigation::AvoidClash() {
-// TODO: Ausweichwinkel, Ausweichfahrt
 	unsigned long currentState = 0;
 	if (x_aktuell < Spielfeldbreite/2){
 		if (y_aktuell < Spielfeldhoehe/2){
@@ -122,14 +123,14 @@ bool Navigation::NotAtPoint() {
 }
 
 void Navigation::drive() {
-
-	// While solange wir fahren
+	// TODO: Zum "Zielbaustein" drehen, danach erst zum nächsten Punkt fahren
+	// While solange wir nicht am Ende angekommen sind
 	while (finished()) {
-		// Ziel bestimmen
-		TargetAngleOld = CalculateAngle(X_Koordinaten[Position],
+		// Zielwinkel  bestimmen
+		ActualTargetAngle = CalculateAngle(X_Koordinaten[Position],
 				Y_Koordinaten[Position]);
 		// Fahrzeug richtung Ziel drehen
-		while (TargetAngleOld != Odo.getAngle()) {
+		while (ActualTargetAngle != Odo.getAngle()) {
 			Rotate();
 			UpdateData();
 		}
@@ -143,7 +144,7 @@ void Navigation::drive() {
 				if (Master) { // Abfrage, ob eigenes Fahrzeug ausweichen soll oder Gegnerisches
 					AvoidClash();
 				} else {
-					// Warte 10 Sekunden
+					// TODO: Abtastfrequenz einbauen. zB. Warte 10 Sekunden
 					// TODO: Daleay nicht gut möglich: eher while mit timer delay(10000);
 					DriveStraightForward();
 				}

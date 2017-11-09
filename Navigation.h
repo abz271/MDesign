@@ -18,7 +18,7 @@ private:
     float forward = 1;			// Motor-Signal für die Vorwärtsfahrt eines Rades
     float backward = 1;			// Motor-Signal für die Rückwärtsfahrt eines Rades
     float driveOffset = 1;		// Offset-Signal zum Gegensteuern bei (ZickZack-Kurs)
-    float TargetAngleOld = 0;	// alter Ziel-Winkel von aktueller Position zu Zielpunkt
+    float ActualTargetAngle = 0;	// alter Ziel-Winkel von aktueller Position zu Zielpunkt
     float TargetAngleNew = 0;	// neuer Ziel-Winkel von aktueller Position zu Zielpunkt
 
     // Attribute für die Positionsbestimmung
@@ -26,7 +26,6 @@ private:
     int Y_Koordinaten[5] = {100, 25, 10, 5, 9};
     float x_aktuell = 0; 		// Startwert in x-Richtung
     float y_aktuell = 0; 		// Startwert in y-Richtung
-    float angle_aktuell = 0;	// Startwert Drehwinkel
     int Position;				// Aktueller Anfahrpunkt
     int MaxPositions = 5;		// Maximal anfahrbare Punkt
 
