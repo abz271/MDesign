@@ -52,9 +52,9 @@ double Navigation::weglaenge(int x, int y) {
 }
 
 // Rotate sorgt fÃ¼r eine Drehung auf der Stelle um den Zielwinkel
-void Navigation::Rotate() {
+void Navigation::Rotate(bool leftRotate, bool rightRotate) {
 
-	if (CalculateAngle(X_Koordinaten[Position], Y_Koordinaten[Position]) < 0) {
+	if (rightRotate && !leftRotate) {
 		// Rechts rum drehen!!!
 		Moto.sendMotorPower(forward, backward);
 	} else {
@@ -95,10 +95,29 @@ void Navigation::AvoidClash() {
 			currentState = 4;	// Aktueller Aufenthalt in Quartal 4: x=1000, y=1500 bis x=2000, y = 3000
 		}
 	}
-
+// TODO: kurzes warten, Gegner noch da ? dann erst drehen
+	// Implementierung sieht einen Lava Bereich vor, da gelten andere Drehbewegungen aufgrund der Fahrbahnmakierung
+	float actualRotationAngle = Odo.getAngle();
+	float aimRotationAngle;
 	switch(currentState){
 	case 1:
 		// TODO: Ausweichverhalten für Quartal 1
+		if (Odo.getAngle() > 0){
+			aimRotationAngle = actualRotationAngle + 90;
+			while((actualRotationAngle != aimRotationAngle + angleTolerance) || (actualRotationAngle != aimRotationAngle - angleTolerance)  ){
+				actualRotationAngle = Odo.getAngle();
+				Rotate(false, true);
+			}
+		} else {
+			// TODO: Hier weiter machen, noch nicht fertig
+			aimRotationAngle = actualRotationAngle - 90;
+			while ((actualRotationAngle != aimRotationAngle + angleTolerance) || (actualRotationAngle != aimRotationAngle - angleTolerance)) {
+				actualRotationAngle = Odo.getAngle();
+				Rotate(false, true);
+			}
+		}
+
+
 		break;
 	case 2:
 		// TODO: Ausweichverhalten für Quartal 2
@@ -126,12 +145,19 @@ void Navigation::drive() {
 	// TODO: Zum "Zielbaustein" drehen, danach erst zum nächsten Punkt fahren
 	// While solange wir nicht am Ende angekommen sind
 	while (finished()) {
+		rightRotate = false;
+		leftRotate = false;
 		// Zielwinkel  bestimmen
 		ActualTargetAngle = CalculateAngle(X_Koordinaten[Position],
 				Y_Koordinaten[Position]);
 		// Fahrzeug richtung Ziel drehen
 		while (ActualTargetAngle != Odo.getAngle()) {
-			Rotate();
+			if (ActualTargetAngle < 0){
+				rightRotate = true;
+			}else{
+				leftRotate = true;
+			}
+			Rotate(leftRotate, rightRotate);
 			UpdateData();
 		}
 		// Gerade zum Ziel Fahren
@@ -139,8 +165,6 @@ void Navigation::drive() {
 			// Gegner ausweichen?
 			if (JSON.getStopEnemy()) {
 				Moto.sendMotorPower(stopp, stopp);	// Daten An Motoren = 0;
-
-
 				if (Master) { // Abfrage, ob eigenes Fahrzeug ausweichen soll oder Gegnerisches
 					AvoidClash();
 				} else {

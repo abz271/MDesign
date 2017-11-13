@@ -14,12 +14,14 @@ private:
 private:
 
     // Attribute für die Motoransteuerung
+    bool leftRotate = false;	// Variable zum links Drehen auf dem Punkt
+    bool rightRotate = false;   // Variable zum rechts drehen auf dem Punkt
     int stopp = 0;				// Stopp-Signal an die Motoransteuerung
     float forward = 1;			// Motor-Signal für die Vorwärtsfahrt eines Rades
     float backward = 1;			// Motor-Signal für die Rückwärtsfahrt eines Rades
     float driveOffset = 1;		// Offset-Signal zum Gegensteuern bei (ZickZack-Kurs)
-    float ActualTargetAngle = 0;	// alter Ziel-Winkel von aktueller Position zu Zielpunkt
-    float TargetAngleNew = 0;	// neuer Ziel-Winkel von aktueller Position zu Zielpunkt
+    float ActualTargetAngle = 0;	// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
+    float TargetAngleNew = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
 
     // Attribute für die Positionsbestimmung
     int X_Koordinaten[5] = {0, 10, 15, 20, 25};
@@ -52,7 +54,7 @@ private:
     void drive();
     void DriveStraightForward();
     void StopDriving();
-    void Rotate();
+    void Rotate(bool leftRotate, bool rightRotate);
     void AvoidClash();
     void nextPosition();
 
