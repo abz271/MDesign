@@ -15,7 +15,7 @@ Odometrie::Odometrie() {
 	// bis jetzt nur Testwerte:
 	x_odometrie = 0;
 	y_odometrie = 0;
-	alpha_odometrie = 0;
+	alpha_odometrie = 90;
 
 }
 
@@ -44,8 +44,8 @@ void Odometrie::updateOdometrie() {
 
 	// Veränderungen der x und y Position des Fahrzeugs
 	// Updaten der Attribute
-	x_odometrie = d_center * cos((alpha_odometrie * PI) / 180);
-	y_odometrie = d_center * sin((alpha_odometrie * PI) / 180);
+	x_odometrie += d_center * cos((alpha_odometrie * PI) / 180);
+	y_odometrie += d_center * sin((alpha_odometrie * PI) / 180);
 
 	//Winkel des Fahrzeugs berechnen und Attribute updaten
 	alpha_odometrie += (-1.0 * (leftWheelChange + rightWheelChange) * 180)
@@ -187,3 +187,34 @@ void Odometrie::testBerechnung(float diffLeft[], float diffRight[],
 	}
 }
 
+void Odometrie::testOdometrie(){
+
+	static int i = 0;
+
+	// nur 10 mal pro sekunde abfragen
+	static unsigned long timeLast = millis();
+	unsigned long timeCur = millis();
+
+	if (timeCur >= timeLast + 1500) {
+
+		timeLast = timeCur;
+
+
+	updateOdometrie();
+
+	Serial.print("Durchlauf ");
+	Serial.print(i);
+	Serial.print(" :");
+	Serial.print("  x: ");
+	Serial.print(x_odometrie);
+	Serial.print("  y: ");
+	Serial.print(y_odometrie);
+	Serial.print("angle: ");
+	Serial.print(alpha_odometrie);
+	Serial.println();
+
+
+		i++;
+
+	}
+}

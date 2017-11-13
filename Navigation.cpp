@@ -1,14 +1,15 @@
 #include "Odometrie.h"
 #include "Navigation.h"
-
+#include "Motor.h"
 #include <Arduino.h>
 
 // Allgemeine Todos
 // TODO: Timer für das automatischen Beenden der Fahrt
 // TODO: Taster implementieren, der die Fahrt beginnt.
 
-Navigation::Navigation() {
-	Position = 0;
+Navigation::Navigation(){
+
+
 }
 
 // Die aktuellen Positionsdaten werden mit den Werten aus der Odometrie und dem Positionsteam angepasst
