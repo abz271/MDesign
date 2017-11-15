@@ -1,4 +1,5 @@
 #include "Motor.h"
+#include "Odometrie.h"
 #include <Arduino.h>
 
 Motor::Motor() {
@@ -120,6 +121,33 @@ void Motor::driveStraight(unsigned char nextVelocityPwm) {
 
 }
 
+// bei Vorwärtsfahrt leichte Korrektur bei Abweichung vom Weg
+void Motor::driveStraightLeft(unsigned char nextVelocityPwm){
+	// Pins einstellen um vorwärts zu fahren
+	// TODO: Richtung einstellen
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+
+	// Geschwindigkeiten für die Motoren einstellen
+	nextVelocityPwmLeft = nextVelocityPwm - driveOffset;
+	nextVelocityPwmRight = nextVelocityPwm;
+
+}
+// bei Vorwärtsfahrt leichte Korrektur bei Abweichung vom Weg
+void Motor::driveStraightRight(unsigned char nextVelocityPwm){
+	// Pins einstellen um vorwärts zu fahren
+	// TODO: Richtung einstellen
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+
+	// Geschwindigkeiten für die Motoren einstellen
+	nextVelocityPwmLeft = nextVelocityPwm;
+	nextVelocityPwmRight = nextVelocityPwm - driveOffset;
+}
 void Motor::turnLeft() {
 
 // Pins einstellen um vorwärts zu fahren
@@ -178,6 +206,29 @@ void Motor::turnRight(unsigned char nextVelocityPwm) {
 	nextVelocityPwmRight = nextVelocityPwm;
 
 }
+// Drehung um 90 Grad nach mathematisch neg. 90 °
+void Motor::rotateLeft90(){
+	float actualRotationAngle = Odo.getAngle();
+	float aimRotationAngle;
+    float angleTolerance = 0.0;			// Winkeltoleranz
+	aimRotationAngle = actualRotationAngle - 90;
+	while(actualRotationAngle != (aimRotationAngle + angleTolerance)){
+		actualRotationAngle = Odo.getAngle();
+		turnLeft();
+	}
+}
+// Drehung um 90 Grad nach mathematisch pos. 90 °
+void Motor::rotateRight90(){
+	float actualRotationAngle = Odo.getAngle();	// Hole dir den aktuellen Fahrtwinkel
+	float aimRotationAngle;
+    float angleTolerance = 0.0;			// Winkeltoleranz
+	aimRotationAngle = actualRotationAngle + 90;	// Addiere Drehwinkel auf
+	while(actualRotationAngle != (aimRotationAngle - angleTolerance)){	// Dreh dich solange, bis du um Drehwinkel gedreht hast
+		actualRotationAngle = Odo.getAngle();
+		turnLeft();
+	}
+}
+
 
 void Motor::stop() {
 
@@ -192,7 +243,7 @@ void Motor::stopInstant() {
 
 void Motor::testAnfahren() {
 
-	static int time = millis();
+	static unsigned int time = millis();
 
 	if(millis() >= time + 50){
 

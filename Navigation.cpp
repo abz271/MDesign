@@ -6,10 +6,10 @@
 // Allgemeine Todos
 // TODO: Timer f¸r das automatischen Beenden der Fahrt
 // TODO: Taster implementieren, der die Fahrt beginnt.
-
+// TODO: Offsets f¸r Position -> Wegl‰nge nutzen?
+// TODO: Timerfunktion schreiben mit Zeitwert als ‹bergabe.
 Navigation::Navigation(){
-
-
+	Position = 0;
 }
 
 // Die aktuellen Positionsdaten werden mit den Werten aus der Odometrie und dem Positionsteam angepasst
@@ -52,33 +52,19 @@ double Navigation::weglaenge(int x, int y) {
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
 }
 
-// Rotate sorgt f√ºr eine Drehung auf der Stelle um den Zielwinkel
-void Navigation::Rotate(bool leftRotate, bool rightRotate) {
 
-	if (rightRotate && !leftRotate) {
-		// Rechts rum drehen!!!
-		Moto.sendMotorPower(forward, backward);
-	} else {
-		// Links rum drehen!!!
-		Moto.sendMotorPower(backward, forward);
-	}
-}
 // Einfache Fahrt gerade aus mit gleicher Beschleunigung auf beiden Motoren
-// Sonderfall: Abweichnung um einen kleinen Winel -> Offset um gegenan zu steuern
+// Sonderfall: Abweichnung um einen kleinen Winkel -> Offset um gegenan zu steuern
 void Navigation::DriveStraightForward() {
 	TargetAngleNew = Odo.getAngle();	// Eingeschlagenen Winkel aktualisieren
 	// Falls das Auto im Toleranzbereich des Ursprungswinkel f‰hrt, einfach gerade aus fahren
 	if ((TargetAngleNew <= (ActualTargetAngle + angleTolerance)) || (TargetAngleNew >= (ActualTargetAngle - angleTolerance))) {
-		Moto.sendMotorPower(forward, forward);
+		Moto.driveStraight(forward);
 	} else if (TargetAngleNew > (ActualTargetAngle + angleTolerance)) {	// falls Drehwinkel aus Odometrie zu groﬂ wird
-		Moto.sendMotorPower((forward + driveOffset), forward);		// Fahrrichtung langsam korrigieren
+		Moto.driveStraightLeft(forward);			// Fahrrichtung langsam korrigieren
 	} else if (TargetAngleNew < (ActualTargetAngle - angleTolerance)) {	// falls Drehwinkel aus Odometrie zu klein wird
-		Moto.sendMotorPower(forward, (forward + driveOffset));		// Fahrrichtung langsam korrigieren
+		Moto.driveStraightRight(forward);		// Fahrrichtung langsam korrigieren
 	}
-}
-
-void Navigation::StopDriving() {
-	Moto.sendMotorPower(stopp, stopp);
 }
 
 void Navigation::AvoidClash() {
@@ -97,44 +83,65 @@ void Navigation::AvoidClash() {
 		}
 	}
 // TODO: kurzes warten, Gegner noch da ? dann erst drehen
-	// Implementierung sieht einen Lava Bereich vor, da gelten andere Drehbewegungen aufgrund der Fahrbahnmakierung
-	float actualRotationAngle = Odo.getAngle();
-	float aimRotationAngle;
-	switch(currentState){
+	unsigned int time = 0;
+	switch (currentState) {
+	// TODO: Lavabereich
+	// TODO: Wie lange gerade aus fahren?
 	case 1:
 		// TODO: Ausweichverhalten f¸r Quartal 1
-		if (Odo.getAngle() > 0){
-			aimRotationAngle = actualRotationAngle + 90;
-			while((actualRotationAngle != aimRotationAngle + angleTolerance) || (actualRotationAngle != aimRotationAngle - angleTolerance)  ){
-				actualRotationAngle = Odo.getAngle();
-				Rotate(false, true);
-			}
+		if (Odo.getAngle() < 0) {
+			Moto.rotateRight90();
 		} else {
-			// TODO: Hier weiter machen, noch nicht fertig
-			aimRotationAngle = actualRotationAngle - 90;
-			while ((actualRotationAngle != aimRotationAngle + angleTolerance) || (actualRotationAngle != aimRotationAngle - angleTolerance)) {
-				actualRotationAngle = Odo.getAngle();
-				Rotate(false, true);
-			}
+			Moto.rotateLeft90();
 		}
-
-
+		time = millis();
+		while(time < maxTime){
+			Moto.driveStraight();
+		}
 		break;
 	case 2:
 		// TODO: Ausweichverhalten f¸r Quartal 2
+		if ((abs(Odo.getAngle()) < 90)) {
+			Moto.rotateRight90();
+		} else {
+			Moto.rotateLeft90();
+		}
+		time = millis();
+		while(time < maxTime){
+			Moto.driveStraight();
+		}
 		break;
 	case 3:
 		// TODO: Ausweichverhalten f¸r Quartal 3
+		if (Odo.getAngle() > 0) {
+			Moto.rotateRight90();
+		} else {
+			Moto.rotateLeft90();
+		}
+		time = millis();
+		while(time < maxTime){
+			Moto.driveStraight();
+		}
 		break;
 	case 4:
 		// TODO: Ausweichverhalten f¸r Quartal 4
+		if ((abs(Odo.getAngle()) < 90)) {
+			Moto.rotateLeft90();
+		} else {
+			Moto.rotateRight90();
+		}
+		time = millis();
+		while(time < maxTime){
+			Moto.driveStraight();
+		}
 		break;
 	}
 }
 
 // Programm beenden
-bool Navigation::finished() {
-
+bool Navigation::finished(){
+	return (x_aktuell == X_Koordinaten[MaxPositions])
+			&& (y_aktuell == Y_Koordinaten[MaxPositions]);
 }
 
 bool Navigation::NotAtPoint() {
@@ -145,32 +152,35 @@ bool Navigation::NotAtPoint() {
 void Navigation::drive() {
 	// TODO: Zum "Zielbaustein" drehen, danach erst zum n‰chsten Punkt fahren
 	// While solange wir nicht am Ende angekommen sind
-	while (finished()) {
-		rightRotate = false;
-		leftRotate = false;
+	while (!finished()) {
+
 		// Zielwinkel  bestimmen
 		ActualTargetAngle = CalculateAngle(X_Koordinaten[Position],
 				Y_Koordinaten[Position]);
-		// Fahrzeug richtung Ziel drehen
+		// Fahrzeug Richtung Ziel drehen
 		while (ActualTargetAngle != Odo.getAngle()) {
 			if (ActualTargetAngle < 0){
-				rightRotate = true;
+				Moto.turnLeft();
 			}else{
-				leftRotate = true;
+				Moto.turnRight();
 			}
-			Rotate(leftRotate, rightRotate);
 			UpdateData();
 		}
 		// Gerade zum Ziel Fahren
 		while (NotAtPoint()) {
+			unsigned int time = 0;
 			// Gegner ausweichen?
 			if (JSON.getStopEnemy()) {
-				Moto.sendMotorPower(stopp, stopp);	// Daten An Motoren = 0;
+				Moto.stopInstant();	// Daten An Motoren = 0;
 				if (Master) { // Abfrage, ob eigenes Fahrzeug ausweichen soll oder Gegnerisches
-					AvoidClash();
+					time = millis();
+					while (time < maxTime);		// warte 5 Sekunden
+					if (JSON.getStopEnemy()){	// Gegner noch da? Umfahren! TODO: Zeit einstellen
+						AvoidClash();
+					}
 				} else {
-					// TODO: Abtastfrequenz einbauen. zB. Warte 10 Sekunden
-					// TODO: Daleay nicht gut mˆglich: eher while mit timer delay(10000);
+					time = millis();
+					while (time < maxTimeWait);		// warte 10 Sekunden bevor weitergefahren wird
 					DriveStraightForward();
 				}
 			} else

@@ -14,12 +14,10 @@ private:
 private:
 
     // Attribute für die Motoransteuerung
-    bool leftRotate = false;	// Variable zum links Drehen auf dem Punkt
-    bool rightRotate = false;   // Variable zum rechts drehen auf dem Punkt
-    int stopp = 0;				// Stopp-Signal an die Motoransteuerung
-    float forward = 1;			// Motor-Signal für die Vorwärtsfahrt eines Rades
-    float backward = 1;			// Motor-Signal für die Rückwärtsfahrt eines Rades
-    float driveOffset = 1;		// Offset-Signal zum Gegensteuern bei (ZickZack-Kurs)
+    unsigned int maxTime = 5000; // Maximal 5s
+    unsigned int maxTimeWait = 10000; // maximal 10s warten
+    float forward = 100;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
+    char driveOffset = 1;		// Offset-Signal zum Gegensteuern bei (ZickZack-Kurs)
     float ActualTargetAngle = 0;	// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
     float TargetAngleNew = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
 
@@ -36,7 +34,6 @@ private:
     bool Master = true;
     int Spielfeldbreite = 2000;
     int Spielfeldhoehe = 3000;
-    float AvoidAngle = 0;
 
     // Änderungen von Torben
     float angleTolerance = 0.4;			// Winkelabweichung beim fahren
@@ -54,7 +51,6 @@ private:
     void drive();
     void DriveStraightForward();
     void StopDriving();
-    void Rotate(bool leftRotate, bool rightRotate);
     void AvoidClash();
     void nextPosition();
 

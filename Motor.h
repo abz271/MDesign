@@ -4,13 +4,14 @@
  * 		Datum:
  */
 
+#include "Odometrie.h"
 
 #ifndef MOTOR_H
 #define	MOTOR_H
 
 class Motor {
 private:
-
+	Odometrie Odo;
 	// Neue Version
 
 	// Pins der H Brücke
@@ -24,6 +25,7 @@ private:
 	unsigned char pwmB = 11;
 
 	// Geschwindigkeiten der Räder
+    unsigned char driveOffset = 1;				// Offset-Signal zum Gegensteuern bei (ZickZack-Kurs)
     unsigned char maxVelocityPwm = 150;			// Wert zwischen 0 und 255, maximale Geschwindigkeit
     unsigned char nextVelocityPwmLeft = 0;		//
     float currentVelocityPwmLeft = 0;			//
@@ -51,6 +53,10 @@ public:
 
     void driveStraight();
     void driveStraight(unsigned char nextVelocityPwm);
+    void driveStraightLeft(unsigned char nextVelocityPwm);
+    void driveStraightRight(unsigned char nextVelocityPwm);
+    void rotateRight90();
+    void rotateLeft90();
     void turnLeft();
     void turnLeft(unsigned char nextVelocityPwm);
     void turnRight();
