@@ -32,8 +32,8 @@ public:
     Odometrie();
     void updateOdometrie();
     void setPosition(int x, int y);
-    float getX_position();
-    float getY_position();
+    int getX_position();
+    int getY_position();
     float getAngle();
 
 

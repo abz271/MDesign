@@ -21,7 +21,7 @@ public:
 	Kommunikation();
 	bool getSignalUsefull();
 	bool getStopEnemy();
-	void getPosition(float& xPos, float& yPos);
+	void getPosition(int& xPos, int& yPos);
 
 	// Zum testen Objekt im Robi.cpp anlegen und dann
 	// diese Funktion einfach im loop laufen lassen

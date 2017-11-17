@@ -146,7 +146,7 @@ bool Kommunikation::getSignalUsefull() {
  * Außerdem wird ein bool zurück gegeben ob die Information verwendbar ist oder nicht
  * Diese Methode kümmert sich um das Übersetzen des JSONs
  */
-void Kommunikation::getPosition(float& xPos, float& yPos) {
+void Kommunikation::getPosition(int& xPos, int& yPos) {
 
 	// Buffer für den Json String
 	StaticJsonBuffer<100> jsonBuffer;

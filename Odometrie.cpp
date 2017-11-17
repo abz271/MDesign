@@ -5,8 +5,8 @@
 
 // Globale Encoder, werden für die Bibliothek benötigt um die Stellung der Räder zu erfassen
 // Es war nicht möglich diese als Attribute der Klasse um zu setzen
-Encoder leftWheel(2, 4);
-Encoder rightWheel(3, 5);
+Encoder leftWheel(2, 5);
+Encoder rightWheel(3, 6);
 
 Odometrie::Odometrie() {
 
@@ -16,6 +16,7 @@ Odometrie::Odometrie() {
 	x_odometrie = 0;
 	y_odometrie = 0;
 	alpha_odometrie = 90;
+
 
 }
 
@@ -58,13 +59,13 @@ float Odometrie::getAngle() {
 
 }
 
-float Odometrie::getX_position() {
+int Odometrie::getX_position() {
 
 	return x_odometrie;
 
 }
 
-float Odometrie::getY_position() {
+int Odometrie::getY_position() {
 
 	return y_odometrie;
 
@@ -195,23 +196,22 @@ void Odometrie::testOdometrie(){
 	static unsigned long timeLast = millis();
 	unsigned long timeCur = millis();
 
-	if (timeCur >= timeLast + 1500) {
+	if (timeCur >= timeLast + 15) {
 
 		timeLast = timeCur;
 
+		updateOdometrie();
 
-	updateOdometrie();
-
-	Serial.print("Durchlauf ");
-	Serial.print(i);
-	Serial.print(" :");
-	Serial.print("  x: ");
-	Serial.print(x_odometrie);
-	Serial.print("  y: ");
-	Serial.print(y_odometrie);
-	Serial.print("angle: ");
-	Serial.print(alpha_odometrie);
-	Serial.println();
+		Serial.print("Durchlauf ");
+		Serial.print(i);
+		Serial.print(" :");
+		Serial.print("  x: ");
+		Serial.print(x_odometrie);
+		Serial.print("  y: ");
+		Serial.print(y_odometrie);
+		Serial.print(" angle: ");
+		Serial.print(alpha_odometrie);
+		Serial.println();
 
 
 		i++;

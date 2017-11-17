@@ -42,15 +42,15 @@ private:
 	// Pins der H Brücke
 	// Left Wheel
 	unsigned char pwmA = 10;	// Pwm Signal, steuert Motorgeschwindigkeit
-	unsigned char in1 = 8;		// Drehrichtung HIGH	LOW		LOW
-	unsigned char in2 = 9;		// Drehrichtung	LOW		HIGH	LOW
+	unsigned char in1 = 22;		// Drehrichtung HIGH	LOW		LOW
+	unsigned char in2 = 23;		// Drehrichtung	LOW		HIGH	LOW
 	// Right Wheel
-	unsigned char in3 = 12;		// Drehrichtung
-	unsigned char in4 = 13;		// Drehrichtung
+	unsigned char in3 = 24;		// Drehrichtung
+	unsigned char in4 = 25;		// Drehrichtung
 	unsigned char pwmB = 11;	// Pwm Signal, steuert Motorgeschwindigkeit
 
 	// Geschwindigkeiten der Räder
-    unsigned char driveOffset = 1;				// Offset-Signal zum Gegensteuern bei (ZickZack-Kurs)
+	unsigned int driveOffset = 10;				// Offset zur Korrektur bei Zickzackfahrt
     unsigned char maxVelocityPwm = 150;			// Wert zwischen 0 und 255, maximale Geschwindigkeit
     unsigned char nextVelocityPwmLeft = 0;		// Ziel Geschwindigkeit
     float currentVelocityPwmLeft = 0;			// Aktuelle Geschwindigkeit
@@ -81,9 +81,7 @@ public:
     void driveStraightLeft(unsigned char nextVelocityPwm);
     void driveStraightRight(unsigned char nextVelocityPwm);
 
-    void rotateRight90();
-    void rotateLeft90();
-
+    void turn(float speed);
     void turnLeft();
     void turnLeft(unsigned char nextVelocityPwm);
     void turnRight();

@@ -7,10 +7,24 @@
 // TODO: Timer für das automatischen Beenden der Fahrt
 // TODO: Taster implementieren, der die Fahrt beginnt.
 // TODO: Offsets für Position -> Weglänge nutzen?
+// TODO: Offsets für Winkel
 // TODO: Timerfunktion schreiben mit Zeitwert als Übergabe.
 Navigation::Navigation(){
 	Position = 0;
 }
+
+Odometrie& Navigation::getOdometrie(){
+	return Odo;
+}
+
+Motor& Navigation::getMotor(){
+	return Moto;
+}
+
+Kommunikation& Navigation::getJSON(){
+	return JSON;
+}
+
 
 // Die aktuellen Positionsdaten werden mit den Werten aus der Odometrie und dem Positionsteam angepasst
 void Navigation::UpdateData() {
@@ -28,20 +42,23 @@ void Navigation::UpdateData() {
 
 // CalculateAngle gibt den um sich zu drehenden Winkel mit dem
 // kÃ¼rzesten Drehwinkel an ->  auch negative Zahlen
-// mit 90Â° Koordinatensystem dem des Fahrzeugs angepasst!
+
 double Navigation::CalculateAngle(int x, int y) {
 
 	double delta_x = x - x_aktuell;
 	double delta_y = y - y_aktuell;
 	double Winkel = atan2(delta_y, delta_x) * 180 / PI;
 
-	if ((Winkel < 180) && (Winkel > 0)) {
-
-		Winkel = (int) (((Winkel * 100 + 0.5) / 100.0) - 90);
-	} else {
-		Winkel = (int) (((Winkel * 100 + 0.5) / 100.0) + 90);
-	}
 	return Winkel;
+}
+
+int Navigation::GetYaktuell(){
+	return y_aktuell;
+}
+
+int Navigation::ConsiderOffset(int Coordinate) {
+	int ConsiderdCoordinate = Coordinate - CoordinateOffset;
+	return ConsiderdCoordinate;
 }
 
 // Berechnet die VektorlÃ¤nge zwischen dem aktuellem Standort und dem Zielpunkt.
@@ -67,6 +84,34 @@ void Navigation::DriveStraightForward() {
 	}
 }
 
+// Drehung um 90 Grad nach mathematisch neg. 90 °
+void Navigation::rotateLeft90(){
+	// checked
+	float actualRotationAngle = Odo.getAngle();
+	float aimRotationAngle;
+	aimRotationAngle = actualRotationAngle - 90.0;
+	Moto.turnLeft();
+	while(actualRotationAngle > aimRotationAngle){
+		actualRotationAngle = Odo.getAngle();
+		Odo.updateOdometrie();
+	}
+	Serial.println(Odo.getAngle());
+	Moto.stop();
+}
+// Drehung um 90 Grad nach mathematisch pos. 90 °
+void Navigation::rotateRight90(){
+	// checked
+	Odo.updateOdometrie();
+	float actualRotationAngle = Odo.getAngle();	// Hole dir den aktuellen Fahrtwinkel
+	float aimRotationAngle;
+	aimRotationAngle = actualRotationAngle + 90.0;	// Addiere Drehwinkel auf
+	Moto.turnRight();
+	while(actualRotationAngle < (aimRotationAngle)){	// Dreh dich solange, bis du um Drehwinkel gedreht hast
+		Odo.updateOdometrie();
+		actualRotationAngle = Odo.getAngle();
+	}
+	Moto.stop();
+}
 void Navigation::AvoidClash() {
 	unsigned long currentState = 0;
 	if (x_aktuell < Spielfeldbreite/2){
@@ -89,22 +134,23 @@ void Navigation::AvoidClash() {
 	// TODO: Wie lange gerade aus fahren?
 	case 1:
 		// TODO: Ausweichverhalten für Quartal 1
-		if (Odo.getAngle() < 0) {
-			Moto.rotateRight90();
+		if (Odo.getAngle() < 90) {
+			rotateRight90();
 		} else {
-			Moto.rotateLeft90();
+			rotateLeft90();
 		}
 		time = millis();
 		while(time < maxTime){
-			Moto.driveStraight();
+			Moto.updateVelocity();
 		}
+		Moto.driveStraight();
 		break;
 	case 2:
 		// TODO: Ausweichverhalten für Quartal 2
-		if ((abs(Odo.getAngle()) < 90)) {
-			Moto.rotateRight90();
+		if ((abs(Odo.getAngle()) < 0)) {
+			rotateRight90();
 		} else {
-			Moto.rotateLeft90();
+			rotateLeft90();
 		}
 		time = millis();
 		while(time < maxTime){
@@ -114,9 +160,9 @@ void Navigation::AvoidClash() {
 	case 3:
 		// TODO: Ausweichverhalten für Quartal 3
 		if (Odo.getAngle() > 0) {
-			Moto.rotateRight90();
+			rotateRight90();
 		} else {
-			Moto.rotateLeft90();
+			rotateLeft90();
 		}
 		time = millis();
 		while(time < maxTime){
@@ -126,9 +172,9 @@ void Navigation::AvoidClash() {
 	case 4:
 		// TODO: Ausweichverhalten für Quartal 4
 		if ((abs(Odo.getAngle()) < 90)) {
-			Moto.rotateLeft90();
+			rotateLeft90();
 		} else {
-			Moto.rotateRight90();
+			rotateRight90();
 		}
 		time = millis();
 		while(time < maxTime){
@@ -193,3 +239,23 @@ void Navigation::drive() {
 	Position++;	// naechsten Punkt anfahren
 }
 
+
+void Navigation::setTargetAngle(float angle) {
+	targetAngle = angle;
+}
+
+void Navigation::turnToTargetAngle() {
+	float e = 0.0;
+	float kp = 2.0;
+
+	Odo.updateOdometrie();
+
+	e = targetAngle - Odo.getAngle();
+
+	if(abs(e) <= 5.0) {
+		Moto.stop();
+	} else {
+		e = e / 360;
+		Moto.turn(kp * e);
+	}
+}
