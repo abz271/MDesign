@@ -2,7 +2,7 @@
 #include "Odometrie.h"
 #include <Encoder.h>
 #include <Arduino.h>
-
+int a = 0;
 // Globale Encoder, werden für die Bibliothek benötigt um die Stellung der Räder zu erfassen
 // Es war nicht möglich diese als Attribute der Klasse um zu setzen
 Encoder leftWheel(2, 5);

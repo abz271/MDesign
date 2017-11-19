@@ -1,7 +1,7 @@
 
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
-
+int a = 0;
 #include "Kommunikation.h"
 #include "Odometrie.h"
 #include "Motor.h"

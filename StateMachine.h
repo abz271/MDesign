@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "Navigation.h"
-
+int a = 0;
 
 #ifndef STATEMACHINE_H
 #define	STATEMACHINE_H

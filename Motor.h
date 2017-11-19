@@ -33,7 +33,7 @@
 
 #ifndef MOTOR_H
 #define	MOTOR_H
-
+int a = 0;
 class Motor {
 private:
 	Odometrie Odo;

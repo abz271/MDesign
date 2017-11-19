@@ -3,7 +3,7 @@
 #include "Odometrie.h"
 #include "Navigation.h"
 #include "StateMachine.h"
-
+int a = 0;
 StateMachine StateM;
 Navigation Navis;	// ist nur ein Dummy
 

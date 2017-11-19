@@ -1,7 +1,7 @@
 #include "Motor.h"
 #include "Odometrie.h"
 #include <Arduino.h>
-
+int a = 0;
 Motor::Motor() {
 	pinMode(in1, OUTPUT);
 	pinMode(in2, OUTPUT);

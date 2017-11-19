@@ -2,7 +2,7 @@
 #include "Navigation.h"
 #include "Motor.h"
 #include <Arduino.h>
-
+int a = 0;
 // Allgemeine Todos
 // TODO: Timer für das automatischen Beenden der Fahrt
 // TODO: Taster implementieren, der die Fahrt beginnt.

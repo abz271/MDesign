@@ -1,6 +1,6 @@
 #ifndef KOMMUNIKATION_H
 #define KOMMUNIKATION_H
-
+int a = 0;
 #include <Arduino.h>
 
 // TODO: Die Byte Längen sind alle noch auf mindestens 45 zu setzen

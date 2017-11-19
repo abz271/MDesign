@@ -1,5 +1,6 @@
 #include "Statemachine.h"
 #include <Arduino.h>
+int a = 0;
 enum states {
 	initState,
 	nextPoint,
@@ -114,7 +115,7 @@ void StateMachine::evalStateMachine() {
 	}
 
 		break;
-	case finished: {
+	case finished: ;
 
 	}
 
