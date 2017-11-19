@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "Kommunikation.h"
-int a = 0;
 
 #ifndef ODOMETRIE_H
 #define ODOMETRIE_H

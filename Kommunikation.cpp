@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <ArduinoJson.h>
 #include <Arduino.h>
-int a = 0;
+
 /*
  * Konstruktor zum initialisieren der Verbindung
  * Dieser Arduino dient als Master

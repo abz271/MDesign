@@ -3,7 +3,6 @@
 #include "Odometrie.h"
 #include "Navigation.h"
 #include "StateMachine.h"
-int a = 0;
 StateMachine StateM;
 Navigation Navis;	// ist nur ein Dummy
 
@@ -36,7 +35,7 @@ void loop() {
 	//delay(3000);
 	//Navis.turnToTargetAngle();
 }
-
+/*
 void testdrive(){
 	for (int i = 1; i < 2; i++){
 		Navis.getMotor().driveStraight(150);
@@ -52,15 +51,15 @@ void testdrive(){
 			Serial.println(Navis.getOdometrie().getY_position());
 			while(1);
 		}
-		delay(2000);/*
+		delay(2000);
 		Navis.rotateLeft90();
 		delay(2000);
 		Navis.rotateLeft90();
-		delay(2000);*/
+		delay(2000);
 	}
 }
 
-
+*/
 void testTurnRight90(){
 /*
 	Serial.println(Navis.getOdometrie().getAngle());

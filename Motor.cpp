@@ -1,7 +1,6 @@
 #include "Motor.h"
 #include "Odometrie.h"
 #include <Arduino.h>
-int a = 0;
 Motor::Motor() {
 	pinMode(in1, OUTPUT);
 	pinMode(in2, OUTPUT);
@@ -24,8 +23,6 @@ void Motor::stop() {
 	nextVelocityPwmLeft = 0;
 	nextVelocityPwmRight = 0;
 
-	updateVelocity();
-
 }
 
 void Motor::driveStraight(unsigned char velocity){
@@ -38,7 +35,6 @@ void Motor::driveStraight(unsigned char velocity){
 
 	nextVelocityPwmLeft = velocity;
 	nextVelocityPwmRight = velocity;
-	updateVelocity();
 
 }
 
@@ -54,8 +50,6 @@ void Motor::driveStraightLeft(unsigned char velocity){
 	nextVelocityPwmLeft = velocity - driveOffset;
 	nextVelocityPwmRight = velocity;
 
-	updateVelocity();
-
 }
 // bei Vorwärtsfahrt leichte Korrektur bei Abweichung vom Weg
 void Motor::driveStraightRight(unsigned char velocity){
@@ -69,7 +63,6 @@ void Motor::driveStraightRight(unsigned char velocity){
 	nextVelocityPwmLeft = velocity;
 	nextVelocityPwmRight = velocity - driveOffset;
 
-	updateVelocity();
 }
 
 void Motor::turn(float velocity) {
@@ -102,9 +95,6 @@ void Motor::turnLeft() {
 // Geschwindigkeiten für die Motoren einstellen
 	nextVelocityPwmLeft = maxVelocity;
 	nextVelocityPwmRight = maxVelocity;
-
-	updateVelocity();
-
 }
 
 // TODO: Löschen?
@@ -121,7 +111,6 @@ void Motor::turnRight() {
 	nextVelocityPwmLeft = maxVelocity;
 	nextVelocityPwmRight = maxVelocity;
 
-	updateVelocity();
 }
 
 

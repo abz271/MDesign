@@ -1,7 +1,6 @@
 
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
-int a = 0;
 #include "Kommunikation.h"
 #include "Odometrie.h"
 #include "Motor.h"
@@ -19,12 +18,13 @@ private:
     unsigned int maxTimeWait = 10000; // maximal 10s warten
     float speed = 150;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
     float speedturn = 50;
-    char driveOffset = 1;		// Offset-Signal zum Gegensteuern der Geschwindigkeit bei (ZickZack-Kurs)
+    char driveOffset = 1;//fliegt // Offset-Signal zum Gegensteuern der Geschwindigkeit bei (ZickZack-Kurs)
     float TargetAngleNew = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
     int CoordinateOffset = 35;	// Offset für den Winkel (in eine Richtung)
+    float ActualTargetAngle = 0;	// fliegt// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
     // Attribute für die Positionsbestimmung
-    int X_Koordinaten[5] = {300, 10, 15, 20, 25};
-    int Y_Koordinaten[5] = {300, 25, 10, 5, 9};
+    int X_Koordinaten[5] = {300, 300, 15, 20, 25};
+    int Y_Koordinaten[5] = {300, 600, 10, 5, 9};
     int x_aktuell = 0; 		// Startwert in x-Richtung
     int y_aktuell = 0; 		// Startwert in y-Richtung
     int Position;				// Aktueller Anfahrpunkt
@@ -40,47 +40,43 @@ private:
     float targetAngle = 0.0;
 
     float e = 0.0;
-public:
-    float ActualTargetAngle = 0;	// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
-    Navigation();
-    int getTargetCoordinateX();
-    int getTargetCoordinateY();
-    float getNegativeDeviation();
-    float getTargetAngle();
-    int ConsiderOffset(int Coordinate);
-    int GetYaktuell();
-    float getSpeed();
-    void setSpeed(int speed);
-    void rotateRight90();
-    void rotateLeft90();
-    void TestDriveToPoint();
-    Odometrie& getOdometrie();
-    Motor& getMotor();
-    Kommunikation& getJSON();
 
+public:	// Allgemeines
+    Navigation();
     void turnToTargetAngle();
     void driveToTargetPosition();
-    void setTargetAngle(float angle);
+    Odometrie& getOdometrie();
+    Kommunikation& getJSON();
+    Motor& getMotor();
+private:	// Allgemeines
+    int signum(float sign);
+public: // Getter
+    float getLengthToPosition(int x, int y);
+    float getCalculateAngle(int x, int y);
+    float getNegativeDeviation();
+    float getTargetAngle();
+    float getSpeed();
     void UpdateData();
+    int getTargetCoordinateX();
+    int getTargetCoordinateY();
+    int getPosition();
+
+public:	// Setter
+    void setTargetAngle(float angle);
+    void setSpeed(int speed);
+    void setNextPosition();
+
+
+
+
+    void rotateRight90();				// zum Testen vorzeigen
+    void rotateLeft90();				// zum Testen vorzeigen
+
 private:
 
-    double LengthToPosition(int x, int y);	// wird evtl nicht mehr gebraucht, erstmal dabei gelassen
-    double CalculateAngle(int x, int y);
-
-
-
-    void drive();
-    void DriveStraightForward();
-    void StopDriving();
-    void AvoidClash();
-    void nextPosition();
-
-
-    int signum(float sign);
-    bool finished();
-    bool NotAtPoint();
-
-
+    void drive();					// kommt in die State
+    void DriveStraightForward();	// kommt in die State
+    void AvoidCrash();				// kommt in die State
 
 };
 

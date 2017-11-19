@@ -1,6 +1,5 @@
 #include "Statemachine.h"
 #include <Arduino.h>
-int a = 0;
 enum states {
 	initState,
 	nextPoint,
@@ -12,7 +11,7 @@ enum states {
 	finished
 };
 static enum states currentState = nextPoint;
-static unsigned long timeLastly = millis();
+
 
 StateMachine::StateMachine() {
 	pinMode(switchPin, INPUT);
@@ -58,6 +57,7 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case finished: {
+		Navi.setSpeed(speedStop);
 		Serial.println("In finished");
 	}
 		break;
@@ -67,6 +67,7 @@ void StateMachine::evalStateMachine() {
 	case initState: {
 		if (switchPin == 1) {
 			currentState = nextPoint;
+			Navi.setNextPosition();
 		}
 	}
 		break;
@@ -74,7 +75,8 @@ void StateMachine::evalStateMachine() {
 	case nextPoint: {
 		// Kleiner Wartezustand
 		// danach weiter drehen
-		unsigned int timeCurrently = millis();
+		unsigned long timeCurrently = millis();
+		static unsigned long timeLastly = millis();
 		if (timeCurrently >= timeLastly + 4000) {
 			timeLastly = timeCurrently;
 			Navi.setSpeed(speedmaxturn);
@@ -94,9 +96,21 @@ void StateMachine::evalStateMachine() {
 		break;
 
 	case driveStraight: {
-		if (Navi.getNegativeDeviation() < safetyDistance)
+		// TODO: Leichte Links bzw rechtsfahrt einbinden
+		// TODO: Wenn e < Schutzradius und dann wieder größer wird. Neu drehen ohne Positon++
+		if (Navi.getJSON().getStopEnemy()){
 			Navi.setSpeed(speedStop);
-			currentState = finished;
+			currentState = avoidCrash;
+		}else if(Navi.getNegativeDeviation() < safetyDistance){
+			Navi.setSpeed(speedStop);
+			if (Navi.getPosition() == 1){
+				currentState = finished;
+			}else{
+				Navi.setNextPosition();
+				currentState = nextPoint;
+			}
+
+		}
 	}
 		break;
 
@@ -115,10 +129,9 @@ void StateMachine::evalStateMachine() {
 	}
 
 		break;
-	case finished: ;
+	case finished: {
 
 	}
-
 		break;
 	}
 }
