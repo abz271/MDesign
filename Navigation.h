@@ -20,7 +20,6 @@ private:
     float speed = 150;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
     float speedturn = 50;
     char driveOffset = 1;		// Offset-Signal zum Gegensteuern der Geschwindigkeit bei (ZickZack-Kurs)
-    float ActualTargetAngle = 0;	// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
     float TargetAngleNew = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
     int CoordinateOffset = 35;	// Offset für den Winkel (in eine Richtung)
     // Attribute für die Positionsbestimmung
@@ -42,8 +41,11 @@ private:
 
     float e = 0.0;
 public:
-
+    float ActualTargetAngle = 0;	// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
     Navigation();
+    int getTargetCoordinateX();
+    int getTargetCoordinateY();
+    float getTargetAngle();
     int ConsiderOffset(int Coordinate);
     int GetYaktuell();
     float getSpeed();

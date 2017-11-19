@@ -202,8 +202,6 @@ void Navigation::drive() {
 	while (!finished()) {
 
 		// Zielwinkel  bestimmen
-		ActualTargetAngle = CalculateAngle(X_Koordinaten[Position],
-				Y_Koordinaten[Position]);
 		// Fahrzeug Richtung Ziel drehen
 		while (ActualTargetAngle != Odo.getAngle()) {
 			if (ActualTargetAngle < 0){
@@ -289,6 +287,17 @@ void Navigation::setSpeed(int speed){
 }
 float Navigation::getSpeed(){
 	return speed;
+}
+float Navigation::getTargetAngle(){
+	float targetAngle = CalculateAngle(X_Koordinaten[Position], Y_Koordinaten[Position]);
+	return targetAngle;
+}
+int Navigation::getTargetCoordinateX(){
+	return X_Koordinaten[Position];
+}
+
+int Navigation::getTargetCoordinateY(){
+	return Y_Koordinaten[Position];
 }
 void Navigation::TestDriveToPoint(){
 

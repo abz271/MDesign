@@ -14,7 +14,6 @@ void testTurnRight90();
 void setup() {
 	Serial.begin(9600);
 	Serial.println("Hallo, Robuino");
-	Navis.setTargetAngle(-90);
 
 }
 
@@ -35,14 +34,7 @@ void loop() {
 	//Serial.println(Navis.getOdometrie().getY_position());
 
 	//delay(3000);
-	//testOdo();
-	Navis.turnToTargetAngle();
-}
-
-void testOdo(){
-
-	Navis.getOdometrie().testOdometrie();
-
+	//Navis.turnToTargetAngle();
 }
 
 void testdrive(){

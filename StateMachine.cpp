@@ -1,67 +1,120 @@
 #include "Statemachine.h"
+#include <Arduino.h>
 enum states {
-    initState, turnToTargetAngle, driveStraight, driveStraightRight, driveStraightLeft, avoidCrash
+	initState,
+	nextPoint,
+	turnToTargetAngle,
+	driveStraight,
+	driveStraightRight,
+	driveStraightLeft,
+	avoidCrash,
+	finished
 };
-static enum states currentState  = initState;
+static enum states currentState = nextPoint;
+static unsigned long timeLastly = millis();
 
-StateMachine::StateMachine(){
-   	pinMode(switchPin,INPUT);
+StateMachine::StateMachine() {
+	pinMode(switchPin, INPUT);
 }
 
-void StateMachine::UpdateData(){
+void StateMachine::UpdateData() {
 	Navi.UpdateData();
 }
 
-//TODO: resetOutputs(), überprüfen, ob funktionalität noch gegeben ist
-
 void StateMachine::evalStateMachine() {
-    switch (currentState) {
-        case initState:
-        	// zum Testen
-        	Navi.getOdometrie().testOdometrie();
-            break;
-        case turnToTargetAngle:
-            break;
-        case driveStraight:
-        	Navi.setSpeed(speedmax);
-            break;
+	switch (currentState) {
+	case initState: {
+		// zum Testen
+		Navi.getOdometrie().testOdometrie();
+		//Serial.println("In initState");
+	}
+		break;
+	case nextPoint: {
 
-        case driveStraightLeft:
-        	Navi.setSpeed(speedmax);
-            break;
-        case driveStraightRight:
-        	Navi.setSpeed(speedmax);
-            break;
-        case avoidCrash:
-        	Navi.setSpeed(speedStop);
-            break;
-    }
-    //TODO: Taster einbauen lassen
-    switch (currentState) {
-        case initState:
-        	if(switchPin){
-        		currentState = turnToTargetAngle;
-        		Navi.setSpeed(speedmax);
-        	}
-            break;
-        case turnToTargetAngle:
-        	if (Navi.getSpeed() == speedStop){
-        		currentState = driveStraight;
-        	}
-            break;
-        case driveStraight:
-            break;
+	}
+		break;
+	case turnToTargetAngle: {
+		Navi.turnToTargetAngle();
+		//Serial.println("In turnToTargetAngle");
+	}
+		break;
+	case driveStraight: {
+		Serial.println("In driveStraight");
+	}
+		break;
 
-        case driveStraightRight:
+	case driveStraightLeft: {
+		//Serial.println("In driveStraightLeft");
+	}
+		break;
+	case driveStraightRight: {
+		//Serial.println("In driveStraightRight");
+	}
+		break;
+	case avoidCrash: {
+		//Serial.println("In avoidCrash");
+	}
+		break;
+	case finished: {
+		//Serial.println("In finished");
+	}
+		break;
+	}
+	//TODO: Taster einbauen lassen
+	switch (currentState) {
+	case initState: {
+		if (switchPin == 1) {
+			currentState = nextPoint;
+		}
+	}
+		break;
 
-            break;
+	case nextPoint: {
+		// Kleiner Wartezustand
+		// danach weiter drehen
+		unsigned int timeCurrently = millis();
+		if (timeCurrently >= timeLastly + 4000) {
+			timeLastly = timeCurrently;
+			Navi.setSpeed(speedmax);
+			float targetAngle = Navi.getTargetAngle();
+			Navi.setTargetAngle(targetAngle);
+			currentState = turnToTargetAngle;
+		}
+	}
+		break;
 
-        case driveStraightLeft:
+	case turnToTargetAngle: {
+		if (Navi.getSpeed() == speedStop) {
+			Serial.println("Navi.getSpeed()");
+			Navi.setSpeed(speedmax);
+			currentState = driveStraight;
+		}
+	}
+		break;
 
-            break;
+	case driveStraight: {
+	}
+		break;
 
-        case avoidCrash:
+	case driveStraightRight: {
+	}
 
-            break;
-    }
+		break;
+
+	case driveStraightLeft: {
+	}
+
+		break;
+
+	case avoidCrash: {
+
+	}
+
+		break;
+	case finished: {
+
+	}
+
+		break;
+	}
 }

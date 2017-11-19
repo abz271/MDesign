@@ -8,9 +8,10 @@
 class StateMachine {
 private:
 	Navigation Navi;
-	int switchPin = 11;
+	int switchPin = 52;
 	int speedmax = 150;
 	int speedStop = 0;
+
 public:
 
 	StateMachine();
