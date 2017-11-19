@@ -51,20 +51,12 @@ private:
 
 	// Geschwindigkeiten der Räder
 	unsigned int driveOffset = 10;				// Offset zur Korrektur bei Zickzackfahrt
-    unsigned char maxVelocityPwm = 150;			// Wert zwischen 0 und 255, maximale Geschwindigkeit
-    unsigned char nextVelocityPwmLeft = 0;		// Ziel Geschwindigkeit
-    float currentVelocityPwmLeft = 0;			// Aktuelle Geschwindigkeit
-    unsigned char nextVelocityPwmRight = 0;		// Ziel Geschwindigkeit
-	float currentVelocityPwmRight = 0;			// Aktuelle Geschwindigkeit
+    unsigned char maxVelocity = 255;			// Wert zwischen 0 und 255, maximale Geschwindigkeit
 
-	// Anfahr- und Anhaltekurvenparameter
-	float startUpTime = 750;									// Zeit bis die maximale Geschwindigkeit erreicht wird
-	float stopTime = 250;										// Zeit bis das Fahrzeug die Geschwindigkeit 0 hat
-	int stepNumber = 20;										// Anzahl der Schritte zum Beschleunigen/ Abbremsen
-	float startStepTime = (float)startUpTime / stepNumber;		// Zeit eines Startschrittes (Stufenzeit)
-	float startStepPwm = (float)maxVelocityPwm /stepNumber;		// Wert eines Starschrites (Stufenwert)
-	float stopStepTime = (float)stopTime / stepNumber;			// Zeit eines Stopschrittes
-	float stoptStepPwm = (float)maxVelocityPwm /stepNumber;		// Wert eines Stopschrittes
+    unsigned char nextVelocityPwmLeft = 0;		// Ziel Geschwindigkeit
+    unsigned char nextVelocityPwmRight = 0;	// Ziel Geschwindigkeit
+
+
 
 public:
 
@@ -74,28 +66,17 @@ public:
 
     void updateVelocity();
 
-    bool isStoped();
+    void driveStraight(unsigned char velocity);
+    void driveStraightLeft(unsigned char velocity);
+    void driveStraightRight(unsigned char velocity);
 
-    void driveStraight();
-    void driveStraight(unsigned char nextVelocityPwm);
-    void driveStraightLeft(unsigned char nextVelocityPwm);
-    void driveStraightRight(unsigned char nextVelocityPwm);
-
-    void turn(float speed);
+    void turn(float velocity);
     void turnLeft();
-    void turnLeft(unsigned char nextVelocityPwm);
     void turnRight();
-    void turnRight(unsigned char nextVelocityPwm);
 
-    //void brake();
     void stop();
-    void stopInstant();
 
     // Testen
-    void testAnfahren();
-    void exampleDriveStraight();
-
-
 };
 
 #endif	/* MOTOR_H */

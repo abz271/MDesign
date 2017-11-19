@@ -29,6 +29,7 @@ Kommunikation& Navigation::getJSON(){
 // Die aktuellen Positionsdaten werden mit den Werten aus der Odometrie und dem Positionsteam angepasst
 void Navigation::UpdateData() {
 	Odo.updateOdometrie();
+	Moto.updateVelocity();
 	if (JSON.getSignalUsefull()) {
 		JSON.getPosition(x_aktuell, y_aktuell);
 		Odo.setPosition(x_aktuell, y_aktuell);
@@ -63,7 +64,7 @@ int Navigation::ConsiderOffset(int Coordinate) {
 
 // Berechnet die Vektorl√§nge zwischen dem aktuellem Standort und dem Zielpunkt.
 // Wird evtl nicht mehr gebraucht
-double Navigation::weglaenge(int x, int y) {
+double Navigation::LengthToPosition(int x, int y) {
 	int delta_x = x - x_aktuell;
 	int delta_y = y - y_aktuell;
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
@@ -76,11 +77,11 @@ void Navigation::DriveStraightForward() {
 	TargetAngleNew = Odo.getAngle();	// Eingeschlagenen Winkel aktualisieren
 	// Falls das Auto im Toleranzbereich des Ursprungswinkel f‰hrt, einfach gerade aus fahren
 	if ((TargetAngleNew <= (ActualTargetAngle + angleTolerance)) || (TargetAngleNew >= (ActualTargetAngle - angleTolerance))) {
-		Moto.driveStraight(forward);
+		Moto.driveStraight(speed);
 	} else if (TargetAngleNew > (ActualTargetAngle + angleTolerance)) {	// falls Drehwinkel aus Odometrie zu groﬂ wird
-		Moto.driveStraightLeft(forward);			// Fahrrichtung langsam korrigieren
+		Moto.driveStraightLeft(speed);			// Fahrrichtung langsam korrigieren
 	} else if (TargetAngleNew < (ActualTargetAngle - angleTolerance)) {	// falls Drehwinkel aus Odometrie zu klein wird
-		Moto.driveStraightRight(forward);		// Fahrrichtung langsam korrigieren
+		Moto.driveStraightRight(speed);		// Fahrrichtung langsam korrigieren
 	}
 }
 
@@ -143,7 +144,7 @@ void Navigation::AvoidClash() {
 		while(time < maxTime){
 			Moto.updateVelocity();
 		}
-		Moto.driveStraight();
+		Moto.driveStraight(speed);
 		break;
 	case 2:
 		// TODO: Ausweichverhalten f¸r Quartal 2
@@ -154,7 +155,7 @@ void Navigation::AvoidClash() {
 		}
 		time = millis();
 		while(time < maxTime){
-			Moto.driveStraight();
+			Moto.driveStraight(speed);
 		}
 		break;
 	case 3:
@@ -166,7 +167,7 @@ void Navigation::AvoidClash() {
 		}
 		time = millis();
 		while(time < maxTime){
-			Moto.driveStraight();
+			Moto.driveStraight(speed);
 		}
 		break;
 	case 4:
@@ -178,7 +179,7 @@ void Navigation::AvoidClash() {
 		}
 		time = millis();
 		while(time < maxTime){
-			Moto.driveStraight();
+			Moto.driveStraight(speed);
 		}
 		break;
 	}
@@ -217,7 +218,7 @@ void Navigation::drive() {
 			unsigned int time = 0;
 			// Gegner ausweichen?
 			if (JSON.getStopEnemy()) {
-				Moto.stopInstant();	// Daten An Motoren = 0;
+				Moto.stop();	// Daten An Motoren = 0;
 				if (Master) { // Abfrage, ob eigenes Fahrzeug ausweichen soll oder Gegnerisches
 					time = millis();
 					while (time < maxTime);		// warte 5 Sekunden
@@ -245,17 +246,57 @@ void Navigation::setTargetAngle(float angle) {
 }
 
 void Navigation::turnToTargetAngle() {
-	float e = 0.0;
-	float kp = 2.0;
-
-	Odo.updateOdometrie();
-
 	e = targetAngle - Odo.getAngle();
-
-	if(abs(e) <= 5.0) {
-		Moto.stop();
-	} else {
-		e = e / 360;
-		Moto.turn(kp * e);
+	Moto.turn(signum(e) * speed);
+	Serial.println(speed);
+	Serial.println(e);
+	if (abs(e) < 100){
+		speed --;
+		// speed wieder beim anfahren hochsetzen
+		if (speed <= 0){
+			Moto.stop();
+		}
 	}
+}
+void Navigation::driveToTargetPosition(int PositionX, int PositionY){
+	e = LengthToPosition(PositionX, PositionY);
+	if (speed > 0){
+		Moto.driveStraight(speed);
+	}
+	if (e < 50){
+		Moto.driveStraight(speed);
+		speed --;
+		if (speed <= 0){
+			Moto.stop();
+		}
+	}
+
+}
+// Gibt Vorzeichen des ¸bergebenen Wertes zur¸ck
+int Navigation::signum(float sign){
+	int NumberSign = 0;
+	if (sign > 0){
+		NumberSign = 1;
+	}
+	if (sign < 0){
+		NumberSign = -1;
+	}
+	return NumberSign;
+}
+
+void Navigation::TestDriveToPoint(){
+
+	setTargetAngle(180);
+	turnToTargetAngle();
+	if( abs(e) <= 1){
+		speed = 150;
+		while (Odo.getY_position() < 1000){
+			Odo.updateOdometrie();
+			Moto.driveStraight(speed);
+		}
+		Serial.println(Odo.getY_position());
+		Moto.stop();
+		while(1);
+	}
+
 }

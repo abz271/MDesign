@@ -12,22 +12,28 @@ void testdrive();
 void testTurnRight90();
 
 void setup() {
-// Add your initialization code here
 	Serial.begin(9600);
 	Serial.println("Hallo, Robuino");
+	Navis.setTargetAngle(-90);
 
-	Navis.setTargetAngle(-180.0);
 }
 
-// The loop function is called in an endless loop
 void loop() {
-	// Ich schreib euch drei test Funktionen
-	// ihr müste diese hier dann einfach aufrufen
-	// z.B. testOdo();
 	//testOdo();
 	//testdrive();
-	//Navis.getMotor().turnLeft();
-	//testTurnRight90();
+	// Navis.getMotor().turnLeft();
+	// testTurnRight90();
+	//Navis.TestDriveToPoint();
+	Navis.UpdateData();		// Immer ganz oben, danach Verarbeitung, danach Ausgabe!
+	//Navis.turnToTargetAngle();
+	//Navis.driveToTargetPosition(0, 200);
+	//Serial.println("Wert in X: ");
+	//Serial.println(Navis.getOdometrie().getX_position());
+	//Serial.println("Wert in Y: ");
+	//Serial.println(Navis.getOdometrie().getY_position());
+
+	//delay(3000);
+	//testOdo();
 	Navis.turnToTargetAngle();
 }
 
@@ -38,21 +44,25 @@ void testOdo(){
 }
 
 void testdrive(){
-
-	for (int i = 1; i < 5; i++){
-		Navis.getMotor().driveStraight();
-		while (Navis.getOdometrie().getY_position() <= Navis.ConsiderOffset(i * 200)) {
+	for (int i = 1; i < 2; i++){
+		Navis.getMotor().driveStraight(150);
+		while (Navis.getOdometrie().getY_position() <= Navis.ConsiderOffset(200)) {
 			Navis.getOdometrie().updateOdometrie();
 		}
-		Serial.println("Punkt");
-		Serial.println(i);
-		Serial.println(Navis.getOdometrie().getY_position());
 		Navis.getMotor().stop();
 		delay(2000);
+		if (i == 1){
+			Navis.getOdometrie().updateOdometrie();
+			Serial.println("Punkt");
+			Serial.println(i);
+			Serial.println(Navis.getOdometrie().getY_position());
+			while(1);
+		}
+		delay(2000);/*
 		Navis.rotateLeft90();
 		delay(2000);
 		Navis.rotateLeft90();
-		delay(2000);
+		delay(2000);*/
 	}
 }
 
@@ -64,8 +74,8 @@ void testTurnRight90(){
 		Navis.rotateRight90();
 		a = 2;
 	}
-	testOdo();
-/*
+	/*testOdo();
+
 	while (a == 2){
 		Navis.rotateLeft90();
 		a = 1;

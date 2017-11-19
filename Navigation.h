@@ -16,11 +16,12 @@ private:
     // Attribute für die Motoransteuerung
     unsigned int maxTime = 5000; // Maximal 5s
     unsigned int maxTimeWait = 10000; // maximal 10s warten
-    float forward = 100;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
+    float speed = 150;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
+    float speedturn = 50;
     char driveOffset = 1;		// Offset-Signal zum Gegensteuern der Geschwindigkeit bei (ZickZack-Kurs)
     float ActualTargetAngle = 0;	// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
     float TargetAngleNew = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
-    float CoordinateOffset = 35.22;	// Offset für den Winkel (in eine Richtung)
+    int CoordinateOffset = 35;	// Offset für den Winkel (in eine Richtung)
     // Attribute für die Positionsbestimmung
     int X_Koordinaten[5] = {0, 10, 15, 20, 25};
     int Y_Koordinaten[5] = {100, 25, 10, 5, 9};
@@ -37,26 +38,32 @@ private:
 
     float angleTolerance = 0.4;			// Winkelabweichung beim fahren
     float targetAngle = 0.0;
+
+    float e = 0.0;
 public:
 
     Navigation();
     int ConsiderOffset(int Coordinate);
     int GetYaktuell();
+    int getSpeed();
     void rotateRight90();
     void rotateLeft90();
+    void TestDriveToPoint();
     Odometrie& getOdometrie();
     Motor& getMotor();
     Kommunikation& getJSON();
 
     void turnToTargetAngle();
+    void driveToTargetPosition(int PositionX, int PositionY);
     void setTargetAngle(float angle);
+    void UpdateData();
 private:
 
-    double weglaenge(int x, int y);	// wird evtl nicht mehr gebraucht, erstmal dabei gelassen
+    double LengthToPosition(int x, int y);	// wird evtl nicht mehr gebraucht, erstmal dabei gelassen
     double CalculateAngle(int x, int y);
 
 
-    void UpdateData();
+
     void drive();
     void DriveStraightForward();
     void StopDriving();
@@ -64,7 +71,7 @@ private:
     void nextPosition();
 
 
-
+    int signum(float sign);
     bool finished();
     bool NotAtPoint();
 

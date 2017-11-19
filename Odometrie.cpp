@@ -196,7 +196,7 @@ void Odometrie::testOdometrie(){
 	static unsigned long timeLast = millis();
 	unsigned long timeCur = millis();
 
-	if (timeCur >= timeLast + 15) {
+	if (timeCur >= timeLast + 1500) {
 
 		timeLast = timeCur;
 
