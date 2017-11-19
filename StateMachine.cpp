@@ -30,7 +30,7 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case nextPoint: {
-
+		//Serial.println("In next Point");
 	}
 		break;
 	case turnToTargetAngle: {
@@ -39,7 +39,8 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case driveStraight: {
-		Serial.println("In driveStraight");
+		Navi.driveToTargetPosition();
+		//Serial.println("In driveStraight");
 	}
 		break;
 
@@ -56,7 +57,7 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case finished: {
-		//Serial.println("In finished");
+		Serial.println("In finished");
 	}
 		break;
 	}
@@ -75,7 +76,7 @@ void StateMachine::evalStateMachine() {
 		unsigned int timeCurrently = millis();
 		if (timeCurrently >= timeLastly + 4000) {
 			timeLastly = timeCurrently;
-			Navi.setSpeed(speedmax);
+			Navi.setSpeed(speedmaxturn);
 			float targetAngle = Navi.getTargetAngle();
 			Navi.setTargetAngle(targetAngle);
 			currentState = turnToTargetAngle;
@@ -85,7 +86,6 @@ void StateMachine::evalStateMachine() {
 
 	case turnToTargetAngle: {
 		if (Navi.getSpeed() == speedStop) {
-			Serial.println("Navi.getSpeed()");
 			Navi.setSpeed(speedmax);
 			currentState = driveStraight;
 		}
@@ -93,6 +93,9 @@ void StateMachine::evalStateMachine() {
 		break;
 
 	case driveStraight: {
+		if (Navi.getNegativeDeviation() < safetyDistance)
+			Navi.setSpeed(speedStop);
+			currentState = finished;
 	}
 		break;
 

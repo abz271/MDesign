@@ -239,16 +239,19 @@ void Navigation::drive() {
 }
 
 
-void Navigation::setTargetAngle(float angle) {
-	targetAngle = angle;
-}
 
 void Navigation::turnToTargetAngle() {
 	e = targetAngle - Odo.getAngle();
 	Moto.turn(signum(e) * speed);
-	Serial.println(speed);
+	Serial.print("  targetAngle: ");
+	Serial.print(targetAngle);
+	Serial.print("  OdoAngle: ");
+	Serial.print(Odo.getAngle());
+	Serial.print(" speed: ");
+	Serial.print(speed);
+	Serial.print(" e: ");
 	Serial.println(e);
-	if (abs(e) < 100){
+	if (abs(e) < 50){
 		speed --;
 		// speed wieder beim anfahren hochsetzen
 		if (speed <= 0){
@@ -256,31 +259,26 @@ void Navigation::turnToTargetAngle() {
 		}
 	}
 }
-void Navigation::driveToTargetPosition(int PositionX, int PositionY){
-	e = LengthToPosition(PositionX, PositionY);
-	if (speed > 0){
-		Moto.driveStraight(speed);
-	}
-	if (e < 50){
-		Moto.driveStraight(speed);
-		speed --;
-		if (speed <= 0){
+void Navigation::driveToTargetPosition(){
+	e = LengthToPosition(X_Koordinaten[Position], Y_Koordinaten[Position]);
+	Moto.driveStraight(speed);
+	Serial.print("  X aktuell: ");
+	Serial.print(x_aktuell);
+	Serial.print(" Y_aktuell: ");
+	Serial.print(y_aktuell);
+	Serial.print(" e: ");
+	Serial.println(e);
+	Serial.print(" speed: ");
+	Serial.println(speed);
+	if (abs(e) < 100){
+		speed = speed - e*0.01;
+		if (e < 10){
 			Moto.stop();
 		}
 	}
 
 }
-// Gibt Vorzeichen des übergebenen Wertes zurück
-int Navigation::signum(float sign){
-	int NumberSign = 0;
-	if (sign > 0){
-		NumberSign = 1;
-	}
-	if (sign < 0){
-		NumberSign = -1;
-	}
-	return NumberSign;
-}
+
 
 void Navigation::setSpeed(int speed){
 	this->speed = speed;
@@ -292,6 +290,11 @@ float Navigation::getTargetAngle(){
 	float targetAngle = CalculateAngle(X_Koordinaten[Position], Y_Koordinaten[Position]);
 	return targetAngle;
 }
+
+void Navigation::setTargetAngle(float angle) {
+	targetAngle = angle;
+}
+
 int Navigation::getTargetCoordinateX(){
 	return X_Koordinaten[Position];
 }
@@ -299,21 +302,19 @@ int Navigation::getTargetCoordinateX(){
 int Navigation::getTargetCoordinateY(){
 	return Y_Koordinaten[Position];
 }
-void Navigation::TestDriveToPoint(){
 
-	setTargetAngle(180);
-	turnToTargetAngle();
-	if( abs(e) <= 1){
-		speed = 150;
-		while (Odo.getY_position() < 1000){
-			Odo.updateOdometrie();
-			Moto.driveStraight(speed);
-		}
-		Serial.println(Odo.getY_position());
-		Moto.stop();
-		while(1);
-	}
-
+float Navigation::getNegativeDeviation(){
+	return e;
 }
 
-
+// Gibt Vorzeichen des übergebenen Wertes zurück
+int Navigation::signum(float sign){
+	int NumberSign = 0;
+	if (sign > 0){
+		NumberSign = 1;
+	}
+	if (sign < 0){
+		NumberSign = -1;
+	}
+	return NumberSign;
+}

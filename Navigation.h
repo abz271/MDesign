@@ -23,8 +23,8 @@ private:
     float TargetAngleNew = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
     int CoordinateOffset = 35;	// Offset für den Winkel (in eine Richtung)
     // Attribute für die Positionsbestimmung
-    int X_Koordinaten[5] = {0, 10, 15, 20, 25};
-    int Y_Koordinaten[5] = {100, 25, 10, 5, 9};
+    int X_Koordinaten[5] = {300, 10, 15, 20, 25};
+    int Y_Koordinaten[5] = {300, 25, 10, 5, 9};
     int x_aktuell = 0; 		// Startwert in x-Richtung
     int y_aktuell = 0; 		// Startwert in y-Richtung
     int Position;				// Aktueller Anfahrpunkt
@@ -45,6 +45,7 @@ public:
     Navigation();
     int getTargetCoordinateX();
     int getTargetCoordinateY();
+    float getNegativeDeviation();
     float getTargetAngle();
     int ConsiderOffset(int Coordinate);
     int GetYaktuell();
@@ -58,7 +59,7 @@ public:
     Kommunikation& getJSON();
 
     void turnToTargetAngle();
-    void driveToTargetPosition(int PositionX, int PositionY);
+    void driveToTargetPosition();
     void setTargetAngle(float angle);
     void UpdateData();
 private:

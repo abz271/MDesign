@@ -10,7 +10,9 @@ private:
 	Navigation Navi;
 	int switchPin = 52;
 	int speedmax = 150;
+	int speedmaxturn = 100;
 	int speedStop = 0;
+	int safetyDistance = 10;
 
 public:
 
