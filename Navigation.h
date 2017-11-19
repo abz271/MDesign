@@ -5,6 +5,7 @@
 #include "Kommunikation.h"
 #include "Odometrie.h"
 #include "Motor.h"
+//#include "StateMachine.h"
 
 class Navigation {
 private:
@@ -45,7 +46,8 @@ public:
     Navigation();
     int ConsiderOffset(int Coordinate);
     int GetYaktuell();
-    int getSpeed();
+    float getSpeed();
+    void setSpeed(int speed);
     void rotateRight90();
     void rotateLeft90();
     void TestDriveToPoint();

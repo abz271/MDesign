@@ -1,11 +1,11 @@
 #include "Arduino.h"
-//The setup function is called once at startup of the sketch
 #include "Kommunikation.h"
 #include "Odometrie.h"
 #include "Navigation.h"
+#include "StateMachine.h"
 
-Navigation Navis;
-int a = 1;
+StateMachine StateM;
+Navigation Navis;	// ist nur ein Dummy
 
 void testOdo();
 void testdrive();
@@ -19,12 +19,14 @@ void setup() {
 }
 
 void loop() {
+	StateM.UpdateData();
+	StateM.evalStateMachine();
 	//testOdo();
 	//testdrive();
 	// Navis.getMotor().turnLeft();
 	// testTurnRight90();
 	//Navis.TestDriveToPoint();
-	Navis.UpdateData();		// Immer ganz oben, danach Verarbeitung, danach Ausgabe!
+	//Navis.UpdateData();		// Immer ganz oben, danach Verarbeitung, danach Ausgabe!
 	//Navis.turnToTargetAngle();
 	//Navis.driveToTargetPosition(0, 200);
 	//Serial.println("Wert in X: ");
@@ -68,13 +70,13 @@ void testdrive(){
 
 
 void testTurnRight90(){
-
+/*
 	Serial.println(Navis.getOdometrie().getAngle());
 	while (a == 1){
 		Navis.rotateRight90();
 		a = 2;
 	}
-	/*testOdo();
+	testOdo();
 
 	while (a == 2){
 		Navis.rotateLeft90();

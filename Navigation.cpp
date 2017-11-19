@@ -284,6 +284,12 @@ int Navigation::signum(float sign){
 	return NumberSign;
 }
 
+void Navigation::setSpeed(int speed){
+	this->speed = speed;
+}
+float Navigation::getSpeed(){
+	return speed;
+}
 void Navigation::TestDriveToPoint(){
 
 	setTargetAngle(180);
@@ -300,3 +306,5 @@ void Navigation::TestDriveToPoint(){
 	}
 
 }
+
+
