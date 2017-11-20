@@ -8,6 +8,7 @@
 // TODO: Offsets für Position -> Weglänge nutzen?
 // TODO: Offsets für Winkel
 // TODO: Timerfunktion schreiben mit Zeitwert als Übergabe.
+// TODO: Beacons nicht detektieren.
 Navigation::Navigation(){
 	Position = 0;
 }
@@ -58,34 +59,6 @@ float Navigation::getLengthToPosition(int x, int y) {
 	int delta_x = x - x_aktuell;
 	int delta_y = y - y_aktuell;
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
-}
-// Drehung um 90 Grad nach mathematisch neg. 90 °
-void Navigation::rotateLeft90(){
-	// checked
-	float actualRotationAngle = Odo.getAngle();
-	float aimRotationAngle;
-	aimRotationAngle = actualRotationAngle - 90.0;
-	Moto.turnLeft();
-	while(actualRotationAngle > aimRotationAngle){
-		actualRotationAngle = Odo.getAngle();
-		Odo.updateOdometrie();
-	}
-	Serial.println(Odo.getAngle());
-	Moto.stop();
-}
-// Drehung um 90 Grad nach mathematisch pos. 90 °
-void Navigation::rotateRight90(){
-	// checked
-	Odo.updateOdometrie();
-	float actualRotationAngle = Odo.getAngle();	// Hole dir den aktuellen Fahrtwinkel
-	float aimRotationAngle;
-	aimRotationAngle = actualRotationAngle + 90.0;	// Addiere Drehwinkel auf
-	Moto.turnRight();
-	while(actualRotationAngle < (aimRotationAngle)){	// Dreh dich solange, bis du um Drehwinkel gedreht hast
-		Odo.updateOdometrie();
-		actualRotationAngle = Odo.getAngle();
-	}
-	Moto.stop();
 }
 
 void Navigation::turnToTargetAngle() {

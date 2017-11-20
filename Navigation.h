@@ -66,12 +66,6 @@ public:	// Setter
     void setSpeed(int speed);
     void setNextPosition();
 
-
-
-
-    void rotateRight90();				// zum Testen vorzeigen
-    void rotateLeft90();				// zum Testen vorzeigen
-
 private:
 
     void drive();					// kommt in die State
