@@ -7,11 +7,16 @@
 class StateMachine {
 private:
 	Navigation Navi;
+	int safetyDistance = 5;
+	int speedmaxturn = 100;
+	int maxPosition = 1;
 	int switchPin = 52;
 	int speedmax = 150;
-	int speedmaxturn = 100;
 	int speedStop = 0;
-	int safetyDistance = 30;
+    bool Master = true;
+
+    float targetAngle = 0;
+
 
 public:
 
@@ -19,8 +24,6 @@ public:
 	void evalStateMachine();
 	void UpdateData();
 	void applyOutputToProcess();
-
-
 
 };
 

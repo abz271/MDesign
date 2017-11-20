@@ -24,8 +24,6 @@ void StateMachine::UpdateData() {
 void StateMachine::evalStateMachine() {
 	switch (currentState) {
 	case initState: {
-		// zum Testen
-		Navi.getOdometrie().testOdometrie();
 		//Serial.println("In initState");
 	}
 		break;
@@ -41,15 +39,6 @@ void StateMachine::evalStateMachine() {
 	case driveStraight: {
 		Navi.driveToTargetPosition();
 		//Serial.println("In driveStraight");
-	}
-		break;
-
-	case driveStraightLeft: {
-		//Serial.println("In driveStraightLeft");
-	}
-		break;
-	case driveStraightRight: {
-		//Serial.println("In driveStraightRight");
 	}
 		break;
 	case avoidCrash: {
@@ -89,6 +78,7 @@ void StateMachine::evalStateMachine() {
 
 	case turnToTargetAngle: {
 		if (Navi.getSpeed() == speedStop) {
+			// Drehung fertig?
 			Navi.setSpeed(speedmax);
 			currentState = driveStraight;
 		}
@@ -101,11 +91,14 @@ void StateMachine::evalStateMachine() {
 		if (Navi.getJSON().getStopEnemy()){
 			Navi.setSpeed(speedStop);
 			currentState = avoidCrash;
-		}else if(Navi.getNegativeDeviation() < safetyDistance){
+		}else if(Navi.getDeviation() < safetyDistance){
+			// Zielkreis erreicht?
 			Navi.setSpeed(speedStop);
-			if (Navi.getPosition() == 1){
+			if (Navi.getPosition() == maxPosition){
+				// Letzte Position erreicht?
 				currentState = finished;
 			}else{
+				// Nächste Position anfahren?
 				Navi.setNextPosition();
 				currentState = nextPoint;
 			}

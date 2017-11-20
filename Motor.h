@@ -53,7 +53,7 @@ private:
     unsigned char maxVelocity = 255;			// Wert zwischen 0 und 255, maximale Geschwindigkeit
 
     unsigned char nextVelocityPwmLeft = 0;		// Ziel Geschwindigkeit
-    unsigned char nextVelocityPwmRight = 0;	// Ziel Geschwindigkeit
+    unsigned char nextVelocityPwmRight = 0;		// Ziel Geschwindigkeit
 
 
 
@@ -64,15 +64,10 @@ public:
 
 
     void updateVelocity();
-
-    void driveStraight(unsigned char velocity);
-    void driveStraightLeft(unsigned char velocity);
-    void driveStraightRight(unsigned char velocity);
+    void driveStraightRegulated(unsigned char velocity, float difference);
 
     void turn(float velocity);
-    void turnLeft();
-    void turnRight();
-
+    void stoppInstantForward();		// TODO: Abfragen
     void stop();
 
     // Testen

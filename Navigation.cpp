@@ -5,7 +5,6 @@
 // Allgemeine Todos
 // TODO: Timer für das automatischen Beenden der Fahrt
 // TODO: Taster implementieren, der die Fahrt beginnt.
-// TODO: Offsets für Position -> Weglänge nutzen?
 // TODO: Offsets für Winkel
 // TODO: Timerfunktion schreiben mit Zeitwert als Übergabe.
 // TODO: Beacons nicht detektieren.
@@ -81,7 +80,8 @@ void Navigation::turnToTargetAngle() {
 }
 void Navigation::driveToTargetPosition(){
 	e = getLengthToPosition(X_Koordinaten[Position], Y_Koordinaten[Position]);
-	Moto.driveStraight(speed);
+	differenceDeviation = (actualDeviation - controlDeviation) * amplifierKp;
+	Moto.driveStraightRegulated(speed, differenceDeviation);
 	Serial.print("  X aktuell: ");
 	Serial.print(x_aktuell);
 	Serial.print(" Y_aktuell: ");
@@ -111,7 +111,7 @@ int Navigation::getTargetCoordinateY(){
 	return Y_Koordinaten[Position];
 }
 
-float Navigation::getNegativeDeviation(){
+float Navigation::getDeviation(){
 	return e;
 }
 
@@ -263,7 +263,7 @@ void Navigation::AvoidCrash() {
 		break;
 	}
 }
-*/
+
 // Einfache Fahrt gerade aus mit gleicher Beschleunigung auf beiden Motoren
 // Sonderfall: Abweichnung um einen kleinen Winkel -> Offset um gegenan zu steuern
 void Navigation::DriveStraightForward() {
@@ -277,3 +277,5 @@ void Navigation::DriveStraightForward() {
 		Moto.driveStraightRight(speed);		// Fahrrichtung langsam korrigieren
 	}
 }
+
+*/

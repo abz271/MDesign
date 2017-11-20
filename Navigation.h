@@ -30,9 +30,13 @@ private:
     int Position;				// Aktueller Anfahrpunkt
     int MaxPositions = 5;		// Maximal anfahrbare Punkt
 
+	float controlDeviation = 0;
+	float actualDeviation = 0;
+	float differenceDeviation = 0;
+	float amplifierKp = 1.5;
+
 
     // Attribute für das Ausweichverhalten
-    bool Master = true;
     int Spielfeldbreite = 2000;
     int Spielfeldhoehe = 3000;
 
@@ -40,6 +44,7 @@ private:
     float targetAngle = 0.0;
 
     float e = 0.0;
+    int offsetDeviation = 10;
 
 public:	// Allgemeines
     Navigation();
@@ -53,7 +58,7 @@ private:	// Allgemeines
 public: // Getter
     float getLengthToPosition(int x, int y);
     float getCalculateAngle(int x, int y);
-    float getNegativeDeviation();
+    float getDeviation();
     float getTargetAngle();
     float getSpeed();
     void UpdateData();

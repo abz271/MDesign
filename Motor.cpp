@@ -25,7 +25,15 @@ void Motor::stop() {
 
 }
 
-void Motor::driveStraight(unsigned char velocity){
+void Motor::stoppInstantForward(){
+	digitalWrite(in1, HIGH);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, HIGH);
+	digitalWrite(in4, LOW);
+}
+
+
+void Motor::driveStraightRegulated(unsigned char velocity, float difference){
 	// checked
 	digitalWrite(in1, LOW);
 	digitalWrite(in2, HIGH);
@@ -33,36 +41,8 @@ void Motor::driveStraight(unsigned char velocity){
 	digitalWrite(in4, HIGH);
 // Geschwindigkeiten für die Motoren einstellen
 
-	nextVelocityPwmLeft = velocity;
-	nextVelocityPwmRight = velocity;
-
-}
-
-// bei Vorwärtsfahrt leichte Korrektur bei Abweichung vom Weg
-void Motor::driveStraightLeft(unsigned char velocity){
-	// checked
-	digitalWrite(in1, LOW);
-	digitalWrite(in2, HIGH);
-	digitalWrite(in3, LOW);
-	digitalWrite(in4, HIGH);
-
-	// Geschwindigkeiten für die Motoren einstellen
-	nextVelocityPwmLeft = velocity - driveOffset;
-	nextVelocityPwmRight = velocity;
-
-}
-// bei Vorwärtsfahrt leichte Korrektur bei Abweichung vom Weg
-void Motor::driveStraightRight(unsigned char velocity){
-	// checked
-	digitalWrite(in1, LOW);
-	digitalWrite(in2, HIGH);
-	digitalWrite(in3, LOW);
-	digitalWrite(in4, HIGH);
-
-	// Geschwindigkeiten für die Motoren einstellen
-	nextVelocityPwmLeft = velocity;
-	nextVelocityPwmRight = velocity - driveOffset;
-
+	nextVelocityPwmLeft = velocity + char(difference);
+	nextVelocityPwmRight = velocity - char(difference);
 }
 
 void Motor::turn(float velocity) {
@@ -83,35 +63,6 @@ void Motor::turn(float velocity) {
 
 }
 
-
-// TODO: Löschen?
-void Motor::turnLeft() {
-
-	digitalWrite(in1, LOW);
-	digitalWrite(in2, HIGH);
-	digitalWrite(in3, HIGH);
-	digitalWrite(in4, LOW);
-
-// Geschwindigkeiten für die Motoren einstellen
-	nextVelocityPwmLeft = maxVelocity;
-	nextVelocityPwmRight = maxVelocity;
-}
-
-// TODO: Löschen?
-void Motor::turnRight() {
-
-// Pins einstellen um vorwärts zu fahren
-// TODO: Richtung einstellen
-	digitalWrite(in1, HIGH);
-	digitalWrite(in2, LOW);
-	digitalWrite(in3, LOW);
-	digitalWrite(in4, HIGH);
-
-// Geschwindigkeiten für die Motoren einstellen
-	nextVelocityPwmLeft = maxVelocity;
-	nextVelocityPwmRight = maxVelocity;
-
-}
 
 
 
