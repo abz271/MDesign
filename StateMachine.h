@@ -11,9 +11,14 @@ private:
 	int speedmaxturn = 100;
 	int maxPosition = 1;
 	int switchPin = 52;
+	int speedStartUp = 45;
 	int speedmax = 150;
 	int speedStop = 0;
     bool Master = true;
+    unsigned long currentQuarter = 0;
+
+    unsigned long timeCur = millis();
+    const unsigned long interval = 1000;
 
     float targetAngle = 0;
 

@@ -4,10 +4,8 @@
 #include <Arduino.h>
 // Allgemeine Todos
 // TODO: Timer für das automatischen Beenden der Fahrt
-// TODO: Taster implementieren, der die Fahrt beginnt.
-// TODO: Offsets für Winkel
-// TODO: Timerfunktion schreiben mit Zeitwert als Übergabe.
 // TODO: Beacons nicht detektieren.
+// TODO:
 Navigation::Navigation(){
 	Position = 0;
 }
@@ -73,7 +71,7 @@ void Navigation::turnToTargetAngle() {
 	Serial.println(e);
 	if (abs(e) < 50){
 		//speed --;		//Originalversion
-		speed = speed - 5;
+		speed = speed - 2;
 		if (speed <= 0){
 			Moto.stop();
 		}
@@ -135,6 +133,24 @@ int Navigation::getPosition(){
 int Navigation::getyPosition(){
 	return y_aktuell;
 }
+
+int Navigation::getCurrentQuarter(){
+	// TODO: Ausweichverhalten implementieren in Navigation
+	if (x_aktuell < AreaWidth/2){
+		if (y_aktuell < AreaHigh/2){
+			currentQuarter = 1;	// Aktueller Aufenthalt in Quartal 1: x=0, y=0 bis x=999, y = 1499
+		}else{
+			currentQuarter = 2;	// Aktueller Aufenthalt in Quartal 2: x=0, y=1500 bis x=999, y = 3000
+		}
+	}else{
+		if (y_aktuell < AreaHigh/2){
+			currentQuarter = 3;	// Aktueller Aufenthalt in Quartal 3: x=1000, y=0 bis x=2000, y = 1499
+		}else{
+			currentQuarter = 4;	// Aktueller Aufenthalt in Quartal 4: x=1000, y=1500 bis x=2000, y = 3000
+		}
+	}
+	return currentQuarter;
+}
 void Navigation::setSpeed(int speed){
 	this->speed = speed;
 }
@@ -158,133 +174,50 @@ int Navigation::signum(float sign){
 	}
 	return NumberSign;
 }
-/*
-void Navigation::drive() {
-	// TODO: Zum "Zielbaustein" drehen, danach erst zum nächsten Punkt fahren
-	// While solange wir nicht am Ende angekommen sind
-	while (!finished()) {
-
-		// Zielwinkel  bestimmen
-		// Fahrzeug Richtung Ziel drehen
-		while (ActualTargetAngle != Odo.getAngle()) {
-			if (ActualTargetAngle < 0){
-				Moto.turnLeft();
-			}else{
-				Moto.turnRight();
-			}
-			UpdateData();
-		}
-		// Gerade zum Ziel Fahren
-		while (NotAtPoint()) {
-			unsigned int time = 0;
-			// Gegner ausweichen?
-			if (JSON.getStopEnemy()) {
-				Moto.stop();	// Daten An Motoren = 0;
-				if (Master) { // Abfrage, ob eigenes Fahrzeug ausweichen soll oder Gegnerisches
-					time = millis();
-					while (time < maxTime);		// warte 5 Sekunden
-					if (JSON.getStopEnemy()){	// Gegner noch da? Umfahren! TODO: Zeit einstellen
-						AvoidCrash();
-					}
-				} else {
-					time = millis();
-					while (time < maxTimeWait);		// warte 10 Sekunden bevor weitergefahren wird
-					DriveStraightForward();
-				}
-			} else
-				// Weiter geradeaus fahren
-				DriveStraightForward();
-		}
-		UpdateData();
-	}
-	// Drehen zum Arbeitspunkt, möglicherweise auslassen
-	Position++;	// naechsten Punkt anfahren
-}
 
 void Navigation::AvoidCrash() {
-	unsigned long currentState = 0;
-	if (x_aktuell < Spielfeldbreite/2){
-		if (y_aktuell < Spielfeldhoehe/2){
-			currentState = 1;	// Aktueller Aufenthalt in Quartal 1: x=0, y=0 bis x=999, y = 1499
-		}else{
-			currentState = 2;	// Aktueller Aufenthalt in Quartal 2: x=0, y=1500 bis x=999, y = 3000
-		}
-	}else{
-		if (y_aktuell < Spielfeldbreite *0.5){
-			currentState = 3;	// Aktueller Aufenthalt in Quartal 3: x=1000, y=0 bis x=2000, y = 1499
-		}else{
-			currentState = 4;	// Aktueller Aufenthalt in Quartal 4: x=1000, y=1500 bis x=2000, y = 3000
-		}
-	}
+
 // TODO: kurzes warten, Gegner noch da ? dann erst drehen
 	unsigned int time = 0;
-	switch (currentState) {
+	switch (currentQuarter) {
 	// TODO: Lavabereich
 	// TODO: Wie lange gerade aus fahren?
 	case 1:
 		// TODO: Ausweichverhalten für Quartal 1
 		if (Odo.getAngle() < 90) {
-			rotateRight90();
+			setTargetAngle(12);
 		} else {
-			rotateLeft90();
+			setTargetAngle(12);
 		}
-		time = millis();
-		while(time < maxTime){
-			Moto.updateVelocity();
-		}
-		Moto.driveStraight(speed);
 		break;
 	case 2:
-		// TODO: Ausweichverhalten für Quartal 2
 		if ((abs(Odo.getAngle()) < 0)) {
-			rotateRight90();
+			//rotateRight90();
 		} else {
-			rotateLeft90();
+			//rotateLeft90();
 		}
 		time = millis();
 		while(time < maxTime){
-			Moto.driveStraight(speed);
+			//Moto.driveStraight(speed);
 		}
 		break;
 	case 3:
 		// TODO: Ausweichverhalten für Quartal 3
 		if (Odo.getAngle() > 0) {
-			rotateRight90();
+			//rotateRight90();
 		} else {
-			rotateLeft90();
+			//rotateLeft90();
 		}
-		time = millis();
-		while(time < maxTime){
-			Moto.driveStraight(speed);
-		}
+
 		break;
 	case 4:
 		// TODO: Ausweichverhalten für Quartal 4
 		if ((abs(Odo.getAngle()) < 90)) {
-			rotateLeft90();
+			//rotateLeft90();
 		} else {
-			rotateRight90();
-		}
-		time = millis();
-		while(time < maxTime){
-			Moto.driveStraight(speed);
+			//rotateRight90();
 		}
 		break;
 	}
 }
 
-// Einfache Fahrt gerade aus mit gleicher Beschleunigung auf beiden Motoren
-// Sonderfall: Abweichnung um einen kleinen Winkel -> Offset um gegenan zu steuern
-void Navigation::DriveStraightForward() {
-	TargetAngleNew = Odo.getAngle();	// Eingeschlagenen Winkel aktualisieren
-	// Falls das Auto im Toleranzbereich des Ursprungswinkel fährt, einfach gerade aus fahren
-	if ((TargetAngleNew <= (ActualTargetAngle + angleTolerance)) || (TargetAngleNew >= (ActualTargetAngle - angleTolerance))) {
-		Moto.driveStraight(speed);
-	} else if (TargetAngleNew > (ActualTargetAngle + angleTolerance)) {	// falls Drehwinkel aus Odometrie zu groß wird
-		Moto.driveStraightLeft(speed);			// Fahrrichtung langsam korrigieren
-	} else if (TargetAngleNew < (ActualTargetAngle - angleTolerance)) {	// falls Drehwinkel aus Odometrie zu klein wird
-		Moto.driveStraightRight(speed);		// Fahrrichtung langsam korrigieren
-	}
-}
-
-*/

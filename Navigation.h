@@ -19,8 +19,7 @@ private:
     float speed = 150;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
     float speedturn = 50;
     char driveOffset = 1;//fliegt // Offset-Signal zum Gegensteuern der Geschwindigkeit bei (ZickZack-Kurs)
-    float TargetAngleNew = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
-    int CoordinateOffset = 35;	// Offset für den Winkel (in eine Richtung)
+    float targetAngle = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
     float ActualTargetAngle = 0;	// fliegt// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
     // Attribute für die Positionsbestimmung
     int X_Koordinaten[5] = {300, 300, 15, 20, 25};
@@ -29,22 +28,17 @@ private:
     int y_aktuell = 0; 		// Startwert in y-Richtung
     int Position;				// Aktueller Anfahrpunkt
     int MaxPositions = 5;		// Maximal anfahrbare Punkt
-
+    // Reglungswerkzeuge
 	float controlDeviation = 0;
 	float actualDeviation = 0;
 	float differenceDeviation = 0;
 	float amplifierKp = 1.5;
-
-
-    // Attribute für das Ausweichverhalten
-    int Spielfeldbreite = 2000;
-    int Spielfeldhoehe = 3000;
-
-    float angleTolerance = 0.4;			// Winkelabweichung beim fahren
-    float targetAngle = 0.0;
-
     float e = 0.0;
     int offsetDeviation = 10;
+    // Ausweichverhalten
+	unsigned long currentQuarter= 1;
+	long AreaWidth = 2000;
+	long AreaHigh = 3000;
 
 public:	// Allgemeines
     Navigation();
@@ -64,6 +58,7 @@ public: // Getter
     void UpdateData();
     int getTargetCoordinateX();
     int getTargetCoordinateY();
+    int getCurrentQuarter();
     int getPosition();
     int getyPosition();
 

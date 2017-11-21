@@ -30,6 +30,9 @@ void Motor::stoppInstantForward(){
 	digitalWrite(in2, LOW);
 	digitalWrite(in3, HIGH);
 	digitalWrite(in4, LOW);
+
+	nextVelocityPwmLeft = 0;
+	nextVelocityPwmRight = 0;
 }
 
 
