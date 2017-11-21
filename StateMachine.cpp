@@ -98,6 +98,7 @@ void StateMachine::evalStateMachine() {
 			currentState = driveStraight;
 		}
 	}
+		break;
 	case driveStraight: {
 		// TODO: Wenn e < Schutzradius und dann wieder größer wird. Neu drehen ohne Positon++
 		if (Navi.getJSON().getStopEnemy()){
