@@ -85,7 +85,7 @@ void Navigation::driveToTargetPosition(){
 	controlDeviation = getTargetAngle();	// Soll Winkel
 	actualDeviation = Odo.getAngle();		// Ist Winkel
 	//Reglerdifferenz verstärken und übertragen
-	differenceDeviation = (actualDeviation - controlDeviation) * amplifierKp;
+	differenceDeviation = (controlDeviation - actualDeviation) * amplifierKp;
 	Moto.driveStraightRegulated(speed, differenceDeviation);
 	Serial.print("  X aktuell: ");
 	Serial.print(x_aktuell);
@@ -96,7 +96,7 @@ void Navigation::driveToTargetPosition(){
 	Serial.print(" speed: ");
 	Serial.println(speed);
 	if (abs(e) < 100){
-		speed = speed - 5;
+		speed--;
 		if (speed <= 0){
 			speed = 50;
 		}
@@ -130,6 +130,10 @@ float Navigation::getTargetAngle(){
 
 int Navigation::getPosition(){
 	return Position;
+}
+
+int Navigation::getyPosition(){
+	return y_aktuell;
 }
 void Navigation::setSpeed(int speed){
 	this->speed = speed;

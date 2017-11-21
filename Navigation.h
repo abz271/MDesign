@@ -65,6 +65,7 @@ public: // Getter
     int getTargetCoordinateX();
     int getTargetCoordinateY();
     int getPosition();
+    int getyPosition();
 
 public:	// Setter
     void setTargetAngle(float angle);

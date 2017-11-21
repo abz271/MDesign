@@ -6,10 +6,6 @@
 StateMachine StateM;
 Navigation Navis;	// ist nur ein Dummy
 
-void testOdo();
-void testdrive();
-void testTurnRight90();
-
 void setup() {
 	Serial.begin(9600);
 	Serial.println("Hallo, Robuino");
@@ -17,29 +13,34 @@ void setup() {
 }
 
 void loop() {
-	StateM.UpdateData();
-	StateM.evalStateMachine();
-	//testOdo();
+	//StateM.UpdateData();
+	//StateM.evalStateMachine();
+	Navis.getOdometrie().testOdometrie();
+	float a = 90;
+	float b = Navis.getOdometrie().getAngle();
+	float c = 0.5;
+	float d = (a-b)*c;
+	Serial.println(a);
+	Serial.println(b);
+	Serial.println(d);
 	//testdrive();
-	// Navis.getMotor().turnLeft();
-	// testTurnRight90();
-	//Navis.TestDriveToPoint();
-	//Navis.UpdateData();		// Immer ganz oben, danach Verarbeitung, danach Ausgabe!
-	//Navis.turnToTargetAngle();
-	//Navis.driveToTargetPosition(0, 200);
-	//Serial.println("Wert in X: ");
-	//Serial.println(Navis.getOdometrie().getX_position());
-	//Serial.println("Wert in Y: ");
-	//Serial.println(Navis.getOdometrie().getY_position());
 
-	//delay(3000);
-	//Navis.turnToTargetAngle();
+
 }
-/*
+
 void testdrive(){
 	for (int i = 1; i < 2; i++){
-		Navis.getMotor().driveStraight(150);
-		while (Navis.getOdometrie().getY_position() <= Navis.ConsiderOffset(200)) {
+		Navis.getMotor().updateVelocity();
+		float a = Navis.getCalculateAngle(0, 2000);
+		float b = Navis.getOdometrie().getAngle();
+		float c = 0.5;
+		float d = 0;
+		while (Navis.getyPosition() <= 2000){
+			a = Navis.getCalculateAngle(0, 2000);
+			b = Navis.getOdometrie().getAngle();
+			d = (a-b)*c;
+			Navis.getMotor().driveStraightRegulated(150, d);
+			Navis.UpdateData();
 			Navis.getOdometrie().updateOdometrie();
 		}
 		Navis.getMotor().stop();
@@ -49,33 +50,13 @@ void testdrive(){
 			Serial.println("Punkt");
 			Serial.println(i);
 			Serial.println(Navis.getOdometrie().getY_position());
-			while(1);
+			while(1){
+				Navis.getOdometrie().testOdometrie();
+			}
 		}
 		delay(2000);
-		Navis.rotateLeft90();
-		delay(2000);
-		Navis.rotateLeft90();
-		delay(2000);
 	}
 }
-
-*/
-void testTurnRight90(){
-/*
-	Serial.println(Navis.getOdometrie().getAngle());
-	while (a == 1){
-		Navis.rotateRight90();
-		a = 2;
-	}
-	testOdo();
-
-	while (a == 2){
-		Navis.rotateLeft90();
-		a = 1;
-	}*/
-}
-
-
 
 /*		Also was muss alles getan werden:
  * 		- die Odometrie muss kalibriert werden

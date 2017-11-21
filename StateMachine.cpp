@@ -84,7 +84,6 @@ void StateMachine::evalStateMachine() {
 		break;
 
 	case driveStraight: {
-		// TODO: Leichte Links bzw rechtsfahrt einbinden
 		// TODO: Wenn e < Schutzradius und dann wieder größer wird. Neu drehen ohne Positon++
 		if (Navi.getJSON().getStopEnemy()){
 			Navi.setSpeed(speedStop);

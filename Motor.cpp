@@ -41,8 +41,8 @@ void Motor::driveStraightRegulated(unsigned char velocity, float difference){
 	digitalWrite(in4, HIGH);
 // Geschwindigkeiten für die Motoren einstellen
 
-	nextVelocityPwmLeft = velocity + char(difference);
-	nextVelocityPwmRight = velocity - char(difference);
+	nextVelocityPwmLeft = velocity - char(difference);
+	nextVelocityPwmRight = velocity + char(difference);
 }
 
 void Motor::turn(float velocity) {

@@ -63,6 +63,7 @@ public:
     ~Motor();
 
 
+
     void updateVelocity();
     void driveStraightRegulated(unsigned char velocity, float difference);
 
