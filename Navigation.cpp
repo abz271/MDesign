@@ -72,7 +72,8 @@ void Navigation::turnToTargetAngle() {
 	Serial.print(" e: ");
 	Serial.println(e);
 	if (abs(e) < 50){
-		speed --;
+		//speed --;		//Originalversion
+		speed = speed - 5;
 		if (speed <= 0){
 			Moto.stop();
 		}
@@ -80,6 +81,10 @@ void Navigation::turnToTargetAngle() {
 }
 void Navigation::driveToTargetPosition(){
 	e = getLengthToPosition(X_Koordinaten[Position], Y_Koordinaten[Position]);
+	// implementierung P-Regler
+	controlDeviation = getTargetAngle();	// Soll Winkel
+	actualDeviation = Odo.getAngle();		// Ist Winkel
+	//Reglerdifferenz verstärken und übertragen
 	differenceDeviation = (actualDeviation - controlDeviation) * amplifierKp;
 	Moto.driveStraightRegulated(speed, differenceDeviation);
 	Serial.print("  X aktuell: ");

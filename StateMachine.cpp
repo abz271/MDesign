@@ -5,8 +5,6 @@ enum states {
 	nextPoint,
 	turnToTargetAngle,
 	driveStraight,
-	driveStraightRight,
-	driveStraightLeft,
 	avoidCrash,
 	finished
 };
@@ -105,16 +103,6 @@ void StateMachine::evalStateMachine() {
 
 		}
 	}
-		break;
-
-	case driveStraightRight: {
-	}
-
-		break;
-
-	case driveStraightLeft: {
-	}
-
 		break;
 
 	case avoidCrash: {
