@@ -22,8 +22,6 @@ Kommunikation& Navigation::getJSON(){
 	return JSON;
 }
 
-
-// Die aktuellen Positionsdaten werden mit den Werten aus der Odometrie und dem Positionsteam angepasst
 void Navigation::UpdateData() {
 	Odo.updateOdometrie();
 	Moto.updateVelocity();
@@ -34,12 +32,7 @@ void Navigation::UpdateData() {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
 	}
-
-
 }
-
-// CalculateAngle gibt den um sich zu drehenden Winkel mit dem
-// kÃ¼rzesten Drehwinkel an ->  auch negative Zahlen
 
 float Navigation::getCalculateAngle(int x, int y) {
 
@@ -85,25 +78,6 @@ void Navigation::driveToTargetPosition(){
 	//Reglerdifferenz verstärken und übertragen
 	differenceDeviation = (controlDeviation - actualDeviation) * amplifierKp;
 	Moto.driveStraightRegulated(speed, differenceDeviation);
-	Serial.print("  X aktuell: ");
-	Serial.print(x_aktuell);
-	Serial.print(" Y_aktuell: ");
-	Serial.print(y_aktuell);
-	Serial.print(" e: ");
-	Serial.println(e);
-	Serial.print(" speed: ");
-	Serial.println(speed);
-	if (abs(e) < 100){
-		speed--;
-		if (speed <= 0){
-			speed = 50;
-		}
-		if (abs(e) <= 30){
-			Moto.stop();
-		}
-
-	}
-
 }
 
 int Navigation::getTargetCoordinateX(){
@@ -130,10 +104,13 @@ int Navigation::getPosition(){
 	return Position;
 }
 
-int Navigation::getyPosition(){
-	return y_aktuell;
+float Navigation::getSafetyRadius(){
+	return safetyRadius;
 }
 
+int Navigation::getMaximalPosition(){
+	return maxPosition;
+}
 int Navigation::getCurrentQuarter(){
 	// TODO: Ausweichverhalten implementieren in Navigation
 	if (x_aktuell < AreaWidth/2){
@@ -197,10 +174,10 @@ void Navigation::AvoidCrash() {
 			//rotateLeft90();
 		}
 		time = millis();
-		while(time < maxTime){
+		//while(time < maxTime){
 			//Moto.driveStraight(speed);
-		}
-		break;
+		//}
+		//break;
 	case 3:
 		// TODO: Ausweichverhalten für Quartal 3
 		if (Odo.getAngle() > 0) {

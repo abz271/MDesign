@@ -14,27 +14,22 @@ private:
 private:
 
     // Attribute für die Motoransteuerung
-    unsigned int maxTime = 5000; // Maximal 5s
-    unsigned int maxTimeWait = 10000; // maximal 10s warten
     float speed = 150;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
-    float speedturn = 50;
-    char driveOffset = 1;//fliegt // Offset-Signal zum Gegensteuern der Geschwindigkeit bei (ZickZack-Kurs)
     float targetAngle = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
-    float ActualTargetAngle = 0;	// fliegt// aktueller Ziel-Winkel von aktueller Position zu Zielpunkt
     // Attribute für die Positionsbestimmung
     int X_Koordinaten[5] = {300, 300, 15, 20, 25};
     int Y_Koordinaten[5] = {300, 600, 10, 5, 9};
     int x_aktuell = 0; 		// Startwert in x-Richtung
     int y_aktuell = 0; 		// Startwert in y-Richtung
+    int maxPosition = 4;	// Maximal 5 Positionen
     int Position;				// Aktueller Anfahrpunkt
-    int MaxPositions = 5;		// Maximal anfahrbare Punkt
     // Reglungswerkzeuge
 	float controlDeviation = 0;
 	float actualDeviation = 0;
 	float differenceDeviation = 0;
 	float amplifierKp = 1.5;
+	float safetyRadius = 10;
     float e = 0.0;
-    int offsetDeviation = 10;
     // Ausweichverhalten
 	unsigned long currentQuarter= 1;
 	long AreaWidth = 2000;
@@ -42,6 +37,7 @@ private:
 
 public:	// Allgemeines
     Navigation();
+    void UpdateData();
     void turnToTargetAngle();
     void driveToTargetPosition();
     Odometrie& getOdometrie();
@@ -52,15 +48,15 @@ private:	// Allgemeines
 public: // Getter
     float getLengthToPosition(int x, int y);
     float getCalculateAngle(int x, int y);
-    float getDeviation();
+    float getSafetyRadius();
     float getTargetAngle();
+    float getDeviation();
     float getSpeed();
-    void UpdateData();
     int getTargetCoordinateX();
     int getTargetCoordinateY();
     int getCurrentQuarter();
+    int getMaximalPosition();
     int getPosition();
-    int getyPosition();
 
 public:	// Setter
     void setTargetAngle(float angle);

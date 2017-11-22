@@ -22,17 +22,16 @@ void Motor::stop() {
 // Geschwindigkeiten für die Motoren einstellen
 	nextVelocityPwmLeft = 0;
 	nextVelocityPwmRight = 0;
-
 }
 
-void Motor::stoppInstantForward(){
+void Motor::stoppInstantForward(unsigned char velocity){
 	digitalWrite(in1, HIGH);
 	digitalWrite(in2, LOW);
 	digitalWrite(in3, HIGH);
 	digitalWrite(in4, LOW);
 
-	nextVelocityPwmLeft = 0;
-	nextVelocityPwmRight = 0;
+	nextVelocityPwmLeft = velocity;
+	nextVelocityPwmRight = velocity;
 }
 
 

@@ -6,11 +6,13 @@ enum states {
 	turnToTargetAngle,
 	startUp,
 	driveStraight,
+	stopMotor,
 	avoidCrash,
 	finished
 };
 static enum states currentState = nextPoint;
 static unsigned long timeLast = millis();
+static unsigned long timeStop = millis();
 
 StateMachine::StateMachine() {
 	pinMode(switchPin, INPUT);
@@ -18,34 +20,39 @@ StateMachine::StateMachine() {
 
 void StateMachine::UpdateData() {
 	Navi.UpdateData();
+	timeCur = millis();
 }
 
 void StateMachine::evalStateMachine() {
 	switch (currentState) {
 	case initState: {
-		//Serial.println("In initState");
+
 	}
 		break;
 	case nextPoint: {
-		//Serial.println("In next Point");
+
 	}
 		break;
 	case turnToTargetAngle: {
 		Navi.turnToTargetAngle();
-		//Serial.println("In turnToTargetAngle");
-	}
 		break;
-	case startUp:{
+	}
+	case startUp: {
 		Navi.driveToTargetPosition();
-		//Serial.println("In startUp")
 	}
 	case driveStraight: {
 		Navi.driveToTargetPosition();
-		//Serial.println("In driveStraight");
+	}
+		break;
+	case stopMotor: {
+		Navi.getMotor().stoppInstantForward(speedmax);
+		if (timeCur >= timeStop + 40) {
+			Navi.setSpeed(speedStop);
+			Navi.getMotor().stop();
+		}
 	}
 		break;
 	case avoidCrash: {
-		//Serial.println("In avoidCrash");
 	}
 		break;
 	case finished: {
@@ -70,10 +77,9 @@ void StateMachine::evalStateMachine() {
 		// danach weiter drehen
 		// kann unter Umständen entfernt werden
 		// zur Verzögerung des Init-Zustandes nutzen?
-		if ((timeCur - timeLast) >= interval ) {
+		if ((timeCur - timeLast) >= interval) {
 			Navi.setSpeed(speedmaxturn);
-			float targetAngle = Navi.getTargetAngle();
-			Navi.setTargetAngle(targetAngle);
+			Navi.setTargetAngle(Navi.getTargetAngle());
 			currentState = turnToTargetAngle;
 		}
 	}
@@ -89,46 +95,54 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 
-	case startUp:{
-		if (Navi.getJSON().getStopEnemy()){
+	case startUp: {
+		if (Navi.getJSON().getStopEnemy()) {
 			Navi.setSpeed(speedStop);
 			currentState = avoidCrash;
-		}else if((timeCur - timeLast) >= interval){
+		} else if ((timeCur - timeLast) >= interval) {
 			Navi.setSpeed(speedmax);
 			currentState = driveStraight;
 		}
 	}
 		break;
-	case driveStraight: {
-		// TODO: Wenn e < Schutzradius und dann wieder größer wird. Neu drehen ohne Positon++
-		if (Navi.getJSON().getStopEnemy()){
-			Navi.setSpeed(speedStop);
-			currentState = avoidCrash;
-		}else if(Navi.getDeviation() < safetyDistance){
-			// Zielkreis erreicht?
-			Navi.setSpeed(speedStop);
-			if (Navi.getPosition() == maxPosition){
-				// Letzte Position erreicht?
-				currentState = finished;
-			}else{
-				// Nächste Position anfahren?
-				Navi.setNextPosition();
-				timeLast = timeCur;
-				currentState = nextPoint;
-			}
 
+	case driveStraight: {
+		if (Navi.getJSON().getStopEnemy()) {
+			Navi.setSpeed(speedStop);
+			timeStop = timeCur;
+			currentState = stopMotor;
+		} else if (Navi.getDeviation() < Navi.getSafetyRadius()) {
+			// Zielkreis erreicht?
+			Navi.setSpeed(speedmax);
+			timeStop = timeCur;
+			currentState = stopMotor;
 		}
 	}
 		break;
 
+	case stopMotor: {
+		if (Navi.getJSON().getStopEnemy()) {
+			currentState = avoidCrash;
+		} else if (Navi.getPosition() == Navi.getMaximalPosition()) {
+			// Letzte Position erreicht?
+			currentState = finished;
+		} else if (Navi.getSpeed() == 0) {
+			timeLast = timeCur;
+			Navi.setNextPosition();
+			currentState = nextPoint;
+		}
+
+	}
+		break;
 	case avoidCrash: {
 		currentQuarter = Navi.getCurrentQuarter();
-
-		break;
 	}
+		break;
+
 	case finished: {
 
 	}
 		break;
+
 	}
 }

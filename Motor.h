@@ -1,34 +1,3 @@
-/*
- * 		Ansteuerung der Motoren
- * 		Version:
- * 		Datum:
- */
-
-/*
- * 		Erklärung:
- * 		updateVelocity muss jeden Programmzyklus aufgerufen werden, also in der laufenden while,
- * 		dem loop oder sonstigem, sonst wird die Motorgeschwindigkeit nicht mehr verändert
- *
- * 		Um gerade aus zu fahren muss einmalig driveStraight aufgerufen werden
- *
- * 		Dann wird gewartet bis man sich nur noch den Anhalteweg entfernt vom Ziel befindet.
- * 		Z.B. will man 20 cm fahren, ruft man nach 19,5 cm die Methode stop auf
- *
- * 		Stop muss auch nur ein einiges mal aufgerufen werden, ab da wird dann die Geschwindigkeit
- * 		innerhalb von einer halben Sekunde auf 0 reduziert
- *
- * 		Das gleiche beim drehen:
- * 		Einmalig: turnLeft
- * 		Warten: Bis man sich den Anhalteweg in grad vor dem Ziel befindet
- * 		(Dieser Wert muss aus dem testen ermittelt werden)
- * 		Einmalig: stop
- *
- * 		Einstellparameter:
- * 		-startUpTime
- * 		-stopTime
- * 		-stepNumber
- */
-
 #include "Odometrie.h"
 
 #ifndef MOTOR_H
@@ -62,16 +31,11 @@ public:
     Motor();
     ~Motor();
 
-
-
     void updateVelocity();
     void driveStraightRegulated(unsigned char velocity, float difference);
-
     void turn(float velocity);
-    void stoppInstantForward();		// TODO: Abfragen
+    void stoppInstantForward(unsigned char velocity);
     void stop();
-
-    // Testen
 };
 
 #endif	/* MOTOR_H */
