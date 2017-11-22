@@ -6,6 +6,7 @@
 #include "Motor.h"
 //#include "StateMachine.h"
 
+
 class Navigation {
 private:
     Kommunikation JSON;
@@ -14,21 +15,21 @@ private:
 private:
 
     // Attribute für die Motoransteuerung
-    float speed = 150;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
+    float speed = 100;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
     float targetAngle = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
     // Attribute für die Positionsbestimmung
-    int X_Koordinaten[5] = {300, 300, 15, 20, 25};
-    int Y_Koordinaten[5] = {300, 600, 10, 5, 9};
+    int X_Koordinaten[5] = {0, 1000, 0, 0, 25};
+    int Y_Koordinaten[5] = {1000, 1000, 0, 0, 9};
     int x_aktuell = 0; 		// Startwert in x-Richtung
     int y_aktuell = 0; 		// Startwert in y-Richtung
-    int maxPosition = 4;	// Maximal 5 Positionen
+    int maxPosition = 2;	// Maximal 5 Positionen
     int Position;				// Aktueller Anfahrpunkt
     // Reglungswerkzeuge
 	float controlDeviation = 0;
 	float actualDeviation = 0;
 	float differenceDeviation = 0;
-	float amplifierKp = 1.5;
-	float safetyRadius = 10;
+	float amplifierKp = 10;
+	float safetyRadius = 30;
     float e = 0.0;
     // Ausweichverhalten
 	unsigned long currentQuarter= 1;
@@ -62,6 +63,8 @@ public:	// Setter
     void setTargetAngle(float angle);
     void setSpeed(int speed);
     void setNextPosition();
+
+    int getY();
 
 private:
 

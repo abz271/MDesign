@@ -26,25 +26,32 @@ void StateMachine::UpdateData() {
 void StateMachine::evalStateMachine() {
 	switch (currentState) {
 	case initState: {
-
+//Serial.println("In initState");
 	}
 		break;
 	case nextPoint: {
-
+		//Serial.println("In nextPoint");
 	}
 		break;
 	case turnToTargetAngle: {
 		Navi.turnToTargetAngle();
-		break;
+		//Serial.println("In turn to Target Angle");
 	}
+	break;
 	case startUp: {
+		//Serial.println("In startUp");
 		Navi.driveToTargetPosition();
+		Navi.setSpeed(60);
 	}
+	break;
 	case driveStraight: {
+		//Serial.println("Drive Straight");
+		Serial.println(Navi.getOdometrie().getAngle());
 		Navi.driveToTargetPosition();
 	}
 		break;
 	case stopMotor: {
+		//Serial.println("Stop Motor");
 		Navi.getMotor().stoppInstantForward(speedmax);
 		if (timeCur >= timeStop + 40) {
 			Navi.setSpeed(speedStop);
@@ -53,11 +60,14 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case avoidCrash: {
+		//Serial.println("avoid crash");
 	}
 		break;
 	case finished: {
-		Navi.setSpeed(speedStop);
-		Serial.println("In finished");
+		//Serial.println("finished");
+		Navi.setTargetAngle(90);
+		Navi.turnToTargetAngle();
+		//Navi.setSpeed(speedStop);
 	}
 		break;
 	}
@@ -100,7 +110,7 @@ void StateMachine::evalStateMachine() {
 			Navi.setSpeed(speedStop);
 			currentState = avoidCrash;
 		} else if ((timeCur - timeLast) >= interval) {
-			Navi.setSpeed(speedmax);
+			Navi.setSpeed(150);
 			currentState = driveStraight;
 		}
 	}
@@ -125,6 +135,7 @@ void StateMachine::evalStateMachine() {
 			currentState = avoidCrash;
 		} else if (Navi.getPosition() == Navi.getMaximalPosition()) {
 			// Letzte Position erreicht?
+			Navi.setSpeed(speedmaxturn);
 			currentState = finished;
 		} else if (Navi.getSpeed() == 0) {
 			timeLast = timeCur;

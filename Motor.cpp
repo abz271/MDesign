@@ -26,9 +26,9 @@ void Motor::stop() {
 
 void Motor::stoppInstantForward(unsigned char velocity){
 	digitalWrite(in1, HIGH);
-	digitalWrite(in2, LOW);
+	digitalWrite(in2, HIGH);
 	digitalWrite(in3, HIGH);
-	digitalWrite(in4, LOW);
+	digitalWrite(in4, HIGH);
 
 	nextVelocityPwmLeft = velocity;
 	nextVelocityPwmRight = velocity;

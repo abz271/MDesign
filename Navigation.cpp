@@ -32,6 +32,7 @@ void Navigation::UpdateData() {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
 	}
+	Odo.testOdometrie();
 }
 
 float Navigation::getCalculateAngle(int x, int y) {
@@ -153,9 +154,9 @@ int Navigation::signum(float sign){
 }
 
 void Navigation::AvoidCrash() {
-
+/*
 // TODO: kurzes warten, Gegner noch da ? dann erst drehen
-	unsigned int time = 0;
+	//unsigned int time = 0;
 	switch (currentQuarter) {
 	// TODO: Lavabereich
 	// TODO: Wie lange gerade aus fahren?
@@ -196,5 +197,9 @@ void Navigation::AvoidCrash() {
 		}
 		break;
 	}
+	*/
 }
 
+int Navigation::getY(){
+	return y_aktuell;
+}
