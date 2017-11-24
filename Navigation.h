@@ -67,9 +67,6 @@ public:	// Setter
     int getY();
 
 private:
-
-    void drive();					// kommt in die State
-    void DriveStraightForward();	// kommt in die State
     void AvoidCrash();				// kommt in die State
 
 };

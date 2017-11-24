@@ -14,7 +14,7 @@ static enum states currentState = nextPoint;
 static unsigned long timeLast = millis();
 static unsigned long timeStop = millis();
 
-StateMachine::StateMachine() {
+StateMachine::StateMachine(){
 	pinMode(switchPin, INPUT);
 }
 
@@ -56,11 +56,12 @@ void StateMachine::evalStateMachine() {
 		if (timeCur >= timeStop + 40) {
 			Navi.setSpeed(speedStop);
 			Navi.getMotor().stop();
-		}
 	}
 		break;
+	}
 	case avoidCrash: {
 		//Serial.println("avoid crash");
+		// TODO: kurzes warten, Gegner noch da ? dann erst drehen
 	}
 		break;
 	case finished: {
@@ -71,7 +72,6 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	}
-	//TODO: Taster einbauen lassen
 	switch (currentState) {
 	case initState: {
 		if (switchPin == 1) {
@@ -132,6 +132,8 @@ void StateMachine::evalStateMachine() {
 
 	case stopMotor: {
 		if (Navi.getJSON().getStopEnemy()) {
+			currentQuarter = Navi.getCurrentQuarter();
+			actualAvoidAngle = Navi.getOdometrie().getAngle();
 			currentState = avoidCrash;
 		} else if (Navi.getPosition() == Navi.getMaximalPosition()) {
 			// Letzte Position erreicht?
@@ -146,7 +148,37 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case avoidCrash: {
-		currentQuarter = Navi.getCurrentQuarter();
+		/*switch (currentQuarter) {
+		case 1: {
+			if (Navi.getOdometrie().getAngle() < 90) {
+				Navi.setTargetAngle(actualAvoidAngle - 90);
+			}else{
+				Navi.setTargetAngle(actualAvoidAngle + 90);
+			}
+		}
+			break;
+		case 2:
+			if (Navi.getOdometrie().getAngle() < 90) {
+				Navi.setTargetAngle(actualAvoidAngle + 90);
+			}else{
+				Navi.setTargetAngle(actualAvoidAngle - 90);
+			}
+			break;
+		case 3:
+			if ((Navi.getOdometrie().getAngle() > 90) && (Navi.getOdometrie().getAngle() < 180)) {
+				Navi.setTargetAngle(actualAvoidAngle + 90);
+			}else{
+				Navi.setTargetAngle(actualAvoidAngle - 90);
+			}
+			break;
+		case 4:
+			if ((Navi.getOdometrie().getAngle() > 90) && (Navi.getOdometrie().getAngle() < 180)) {
+				Navi.setTargetAngle(actualAvoidAngle - 90);
+			}else{
+				Navi.setTargetAngle(actualAvoidAngle + 90);
+			}
+			break;
+		}*/
 	}
 		break;
 
@@ -154,6 +186,5 @@ void StateMachine::evalStateMachine() {
 
 	}
 		break;
-
-	}
+}
 }

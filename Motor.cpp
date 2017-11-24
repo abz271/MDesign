@@ -4,6 +4,8 @@
 Motor::Motor() {
 	pinMode(in1, OUTPUT);
 	pinMode(in2, OUTPUT);
+	pinMode(in3, OUTPUT);
+	pinMode(in4, OUTPUT);
 }
 
 Motor::~Motor() {

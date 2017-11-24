@@ -4,8 +4,8 @@
 #include <Arduino.h>
 // Globale Encoder, werden für die Bibliothek benötigt um die Stellung der Räder zu erfassen
 // Es war nicht möglich diese als Attribute der Klasse um zu setzen
-Encoder leftWheel(2, 5);
-Encoder rightWheel(3, 6);
+Encoder leftWheel(2, 6);
+Encoder rightWheel(3, 5);
 
 Odometrie::Odometrie() {
 
@@ -85,8 +85,8 @@ void Odometrie::getDiffWheelDistance(float& leftWheelChange,
 	getDiffWheelAngle(leftRotaryChange, rightRotaryChange);
 
 	// Berechnung zurÃ¼ck gelegte Strecke mit dem Umfang der RÃ¤der
-	leftWheelChange = leftRotaryChange / 360.0 * radUmfang;
-	rightWheelChange = rightRotaryChange / 360.0 * radUmfang;
+	leftWheelChange = leftRotaryChange / 360.0 * radUmfangLinks;
+	rightWheelChange = rightRotaryChange / 360.0 * radUmfangRechts;
 
 }
 

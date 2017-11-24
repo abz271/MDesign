@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "Navigation.h"
+#include "Vec.h"
 
 #ifndef STATEMACHINE_H
 #define	STATEMACHINE_H
@@ -18,6 +19,7 @@ private:
 	// Ausweichverhalten
     bool Master = true;
     unsigned long currentQuarter = 0;
+    float actualAvoidAngle = 0;
 
     // Zeitverhalten
     unsigned long timeCur = millis();

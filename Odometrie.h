@@ -8,7 +8,7 @@ class Odometrie {
 private:
 
 	// Geometrie des Fahrzeugs
-    float Achsabstand = 276.5;	// in mm
+    float Achsabstand = 277.3;	// in mm
 
 	// Position
     float x_odometrie;
@@ -17,8 +17,11 @@ private:
 
 
     // Rad Geometrie
-    const float radDurchmesser = 49.4 * (1000.0/1009.0);
-    const float radUmfang = radDurchmesser * PI;
+    const float radDurchmesserLinks = 48.83 * (1000.0/1009.0);
+    const float radUmfangLinks = radDurchmesserLinks * PI;
+
+    const float radDurchmesserRechts = 49.06 * (1000.0/1009.0);
+    const float radUmfangRechts = radDurchmesserRechts * PI;
 
     // Encoder sind global, in der cpp definiert definiert
     // Rotary Encoder Methoden

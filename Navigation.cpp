@@ -153,53 +153,6 @@ int Navigation::signum(float sign){
 	return NumberSign;
 }
 
-void Navigation::AvoidCrash() {
-/*
-// TODO: kurzes warten, Gegner noch da ? dann erst drehen
-	//unsigned int time = 0;
-	switch (currentQuarter) {
-	// TODO: Lavabereich
-	// TODO: Wie lange gerade aus fahren?
-	case 1:
-		// TODO: Ausweichverhalten für Quartal 1
-		if (Odo.getAngle() < 90) {
-			setTargetAngle(12);
-		} else {
-			setTargetAngle(12);
-		}
-		break;
-	case 2:
-		if ((abs(Odo.getAngle()) < 0)) {
-			//rotateRight90();
-		} else {
-			//rotateLeft90();
-		}
-		time = millis();
-		//while(time < maxTime){
-			//Moto.driveStraight(speed);
-		//}
-		//break;
-	case 3:
-		// TODO: Ausweichverhalten für Quartal 3
-		if (Odo.getAngle() > 0) {
-			//rotateRight90();
-		} else {
-			//rotateLeft90();
-		}
-
-		break;
-	case 4:
-		// TODO: Ausweichverhalten für Quartal 4
-		if ((abs(Odo.getAngle()) < 90)) {
-			//rotateLeft90();
-		} else {
-			//rotateRight90();
-		}
-		break;
-	}
-	*/
-}
-
 int Navigation::getY(){
 	return y_aktuell;
 }
