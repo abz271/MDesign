@@ -1,4 +1,4 @@
-#include <math.h>
+#include "Arduino.h"
 #include "Vec.h"
 
 Vec::Vec() {
@@ -6,10 +6,19 @@ Vec::Vec() {
     y = 0.0;
 
 }
-
+Vec::Vec(float angle){
+	x = cos ((angle+90)*M_PI/180);
+	y = sin ((angle+90)*M_PI/180);
+}
 Vec::Vec(float x, float y) {
     this->x = x;
     this->y = y;
+}
+
+Vec Vec::MakeUnit(){
+	float l = getLength();
+	Vec b(x/l,y/l);
+	return b;
 }
 
 Vec Vec::operator+(Vec v) {
@@ -22,7 +31,7 @@ float Vec::getLength() {
 }
 
 float Vec::getAngle() {
-    return (atan2(y, x) *180 / M_PI)+90;
+    return (atan2(y, x) *180 / M_PI);
 }
 
 void Vec::setX(float x) {

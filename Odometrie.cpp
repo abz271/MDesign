@@ -14,7 +14,7 @@ Odometrie::Odometrie() {
 	// bis jetzt nur Testwerte:
 	x_odometrie = 0;
 	y_odometrie = 0;
-	alpha_odometrie = 90;
+	alpha_odometrie = 0;
 
 
 }

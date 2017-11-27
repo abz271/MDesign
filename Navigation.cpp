@@ -105,6 +105,14 @@ int Navigation::getPosition(){
 	return Position;
 }
 
+int Navigation::getY(){
+	return y_aktuell;
+}
+
+int Navigation::getX(){
+	return x_aktuell;
+}
+
 float Navigation::getSafetyRadius(){
 	return safetyRadius;
 }
@@ -153,6 +161,4 @@ int Navigation::signum(float sign){
 	return NumberSign;
 }
 
-int Navigation::getY(){
-	return y_aktuell;
-}
+

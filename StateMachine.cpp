@@ -1,4 +1,6 @@
 #include "Statemachine.h"
+#include "Gerade.h"
+#include "Vec.h"
 #include <Arduino.h>
 enum states {
 	initState,
@@ -14,7 +16,7 @@ static enum states currentState = nextPoint;
 static unsigned long timeLast = millis();
 static unsigned long timeStop = millis();
 
-StateMachine::StateMachine(){
+StateMachine::StateMachine() {
 	pinMode(switchPin, INPUT);
 }
 
@@ -37,13 +39,13 @@ void StateMachine::evalStateMachine() {
 		Navi.turnToTargetAngle();
 		//Serial.println("In turn to Target Angle");
 	}
-	break;
+		break;
 	case startUp: {
 		//Serial.println("In startUp");
 		Navi.driveToTargetPosition();
 		Navi.setSpeed(60);
 	}
-	break;
+		break;
 	case driveStraight: {
 		//Serial.println("Drive Straight");
 		Serial.println(Navi.getOdometrie().getAngle());
@@ -56,7 +58,7 @@ void StateMachine::evalStateMachine() {
 		if (timeCur >= timeStop + 40) {
 			Navi.setSpeed(speedStop);
 			Navi.getMotor().stop();
-	}
+		}
 		break;
 	}
 	case avoidCrash: {
@@ -108,6 +110,7 @@ void StateMachine::evalStateMachine() {
 	case startUp: {
 		if (Navi.getJSON().getStopEnemy()) {
 			Navi.setSpeed(speedStop);
+			timeStop = timeCur;
 			currentState = avoidCrash;
 		} else if ((timeCur - timeLast) >= interval) {
 			Navi.setSpeed(150);
@@ -148,37 +151,42 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case avoidCrash: {
-		/*switch (currentQuarter) {
-		case 1: {
-			if (Navi.getOdometrie().getAngle() < 90) {
-				Navi.setTargetAngle(actualAvoidAngle - 90);
-			}else{
-				Navi.setTargetAngle(actualAvoidAngle + 90);
+		Gerade Vec1(Vec(0, 0), Vec(3000, 0).MakeUnit());	// Vec 1 und Vec 2 parallel
+		Gerade Vec2(Vec(0, 2000), Vec(3000, 2000).MakeUnit());	// Vec 3 und Vec 4 parallel
+		Gerade Vec3(Vec(0, 0), Vec(0, 2000).MakeUnit());
+		Gerade Vec4(Vec(3000, 0), Vec(3000, 2000).MakeUnit());
+		Vec o(Navi.getX(), Navi.getY());
+		Vec r(Navi.getOdometrie().getAngle());
+		Gerade Intersection(o, r);
+		//gedrehte Richtungsvektoren: Schnittpunkt mit Spielfeldvektoren prüfen
+		float a = Intersection.getIntersection(Vec1);
+		float b = Intersection.getIntersection(Vec2);
+		float c = Intersection.getIntersection(Vec3);
+		float d = Intersection.getIntersection(Vec4);
+		if (((timeCur - timeLast) >= intervalStop)){
+			if (Master && Navi.getJSON().getStopEnemy() ) {
+				if ((a >= 0) && (a <= 3000)){
+					if (a > b){
+						Navi.setTargetAngle(Navi.getOdometrie().getAngle() - 90);
+					}else{
+						Navi.setTargetAngle(Navi.getOdometrie().getAngle() + 90);
+					}
+				}else{
+					if (c > d){
+						Navi.setTargetAngle(Navi.getOdometrie().getAngle() + 90);
+					}else{
+						Navi.setTargetAngle(Navi.getOdometrie().getAngle() - 90);
+					}
+				}
+				currentState = turnToTargetAngle;
+			} else {
+				if (!Navi.getJSON().getStopEnemy()) {
+					currentState = driveStraight;
+				}
+
 			}
+		timeLast = timeCur;
 		}
-			break;
-		case 2:
-			if (Navi.getOdometrie().getAngle() < 90) {
-				Navi.setTargetAngle(actualAvoidAngle + 90);
-			}else{
-				Navi.setTargetAngle(actualAvoidAngle - 90);
-			}
-			break;
-		case 3:
-			if ((Navi.getOdometrie().getAngle() > 90) && (Navi.getOdometrie().getAngle() < 180)) {
-				Navi.setTargetAngle(actualAvoidAngle + 90);
-			}else{
-				Navi.setTargetAngle(actualAvoidAngle - 90);
-			}
-			break;
-		case 4:
-			if ((Navi.getOdometrie().getAngle() > 90) && (Navi.getOdometrie().getAngle() < 180)) {
-				Navi.setTargetAngle(actualAvoidAngle - 90);
-			}else{
-				Navi.setTargetAngle(actualAvoidAngle + 90);
-			}
-			break;
-		}*/
 	}
 		break;
 
@@ -186,5 +194,5 @@ void StateMachine::evalStateMachine() {
 
 	}
 		break;
-}
+	}
 }

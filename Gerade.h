@@ -12,7 +12,8 @@ public:
 	Gerade();
 	Gerade(Vec o, Vec r);
 	float getIntersection(Gerade g);
-
+	float calculateXInterception(float lambda);
+	float calculateYInterception(float lambda);
 };
 
 #endif /* GERADE_H */

@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "Gerade.h"
 #include "Vec.h"
 
@@ -9,7 +10,7 @@ Gerade::Gerade(){
 Gerade::Gerade(Vec o, Vec r):
 	o(o),
 	r(r) {
-k = 0;
+	k = 0;
 }
 
 float Gerade::getIntersection(Gerade g){
@@ -18,5 +19,4 @@ float Gerade::getIntersection(Gerade g){
 
 	return Intersection;
 }
-
 

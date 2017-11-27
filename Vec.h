@@ -8,8 +8,10 @@ public:
     float x;
     float y;
     Vec();
+    Vec(float angle);
     Vec(float x, float y);
     Vec operator+(Vec v);
+    Vec MakeUnit();
     float getLength();
     float getAngle();
     void setX(float x);

@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "Navigation.h"
-#include "Vec.h"
+#include "Gerade.h"
 
 #ifndef STATEMACHINE_H
 #define	STATEMACHINE_H
@@ -24,6 +24,7 @@ private:
     // Zeitverhalten
     unsigned long timeCur = millis();
     const unsigned long interval = 1000;
+    const unsigned long intervalStop = 5000;
 
 public:
 

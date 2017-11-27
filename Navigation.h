@@ -58,13 +58,14 @@ public: // Getter
     int getCurrentQuarter();
     int getMaximalPosition();
     int getPosition();
+    int getY();
+    int getX();
 
 public:	// Setter
     void setTargetAngle(float angle);
     void setSpeed(int speed);
     void setNextPosition();
 
-    int getY();
 
 private:
     void AvoidCrash();				// kommt in die State
