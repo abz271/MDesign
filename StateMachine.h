@@ -25,6 +25,7 @@ private:
     unsigned long timeCur = millis();
     const unsigned long interval = 1000;
     const unsigned long intervalStop = 5000;
+    const unsigned long intervalDrive = 3000;
 
 public:
 

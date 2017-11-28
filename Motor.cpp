@@ -36,6 +36,15 @@ void Motor::stoppInstantForward(unsigned char velocity){
 	nextVelocityPwmRight = velocity;
 }
 
+void Motor::driveStraight(){
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, HIGH);
+	digitalWrite(in3, LOW);
+	digitalWrite(in4, HIGH);
+
+	nextVelocityPwmLeft = 150;
+	nextVelocityPwmRight = 150;
+}
 
 void Motor::driveStraightRegulated(unsigned char velocity, float difference){
 	// checked

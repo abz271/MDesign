@@ -33,6 +33,7 @@ public:
 
     void updateVelocity();
     void driveStraightRegulated(unsigned char velocity, float difference);
+    void driveStraight();
     void turn(float velocity);
     void stoppInstantForward(unsigned char velocity);
     void stop();

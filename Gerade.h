@@ -14,6 +14,8 @@ public:
 	float getIntersection(Gerade g);
 	float calculateXInterception(float lambda);
 	float calculateYInterception(float lambda);
+
+	void testSchnittpunkt();
 };
 
 #endif /* GERADE_H */

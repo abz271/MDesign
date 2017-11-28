@@ -6,8 +6,10 @@ enum states {
 	initState,
 	nextPoint,
 	turnToTargetAngle,
+	turnToAvoidTargetAngle,
 	startUp,
-	driveStraight,
+	driveShortlyStraight,
+	driveStraightRegulated,
 	stopMotor,
 	avoidCrash,
 	finished
@@ -40,13 +42,20 @@ void StateMachine::evalStateMachine() {
 		//Serial.println("In turn to Target Angle");
 	}
 		break;
+	case turnToAvoidTargetAngle: {
+		Navi.turnToTargetAngle();
+	}
+		break;
+	case driveShortlyStraight: {
+		Navi.getMotor().driveStraight();
+	}
 	case startUp: {
 		//Serial.println("In startUp");
 		Navi.driveToTargetPosition();
 		Navi.setSpeed(60);
 	}
 		break;
-	case driveStraight: {
+	case driveStraightRegulated: {
 		//Serial.println("Drive Straight");
 		Serial.println(Navi.getOdometrie().getAngle());
 		Navi.driveToTargetPosition();
@@ -62,8 +71,6 @@ void StateMachine::evalStateMachine() {
 		break;
 	}
 	case avoidCrash: {
-		//Serial.println("avoid crash");
-		// TODO: kurzes warten, Gegner noch da ? dann erst drehen
 	}
 		break;
 	case finished: {
@@ -107,6 +114,14 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 
+	case turnToAvoidTargetAngle: {
+		if (Navi.getSpeed() == speedStop) {
+			Navi.setSpeed(speedStartUp);
+			timeLast = timeCur;
+			currentState = driveShortlyStraight;
+		}
+	}
+	break;
 	case startUp: {
 		if (Navi.getJSON().getStopEnemy()) {
 			Navi.setSpeed(speedStop);
@@ -114,12 +129,20 @@ void StateMachine::evalStateMachine() {
 			currentState = avoidCrash;
 		} else if ((timeCur - timeLast) >= interval) {
 			Navi.setSpeed(150);
-			currentState = driveStraight;
+			currentState = driveStraightRegulated;
 		}
 	}
 		break;
 
-	case driveStraight: {
+	case driveShortlyStraight: {
+		if ((timeCur - timeLast) >= intervalDrive){
+			Navi.setSpeed(speedmaxturn);
+			timeLast = timeCur;
+			currentState = nextPoint;
+		}
+	}
+	break;
+	case driveStraightRegulated: {
 		if (Navi.getJSON().getStopEnemy()) {
 			Navi.setSpeed(speedStop);
 			timeStop = timeCur;
@@ -151,41 +174,45 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case avoidCrash: {
-		Gerade Vec1(Vec(0, 0), Vec(3000, 0).MakeUnit());	// Vec 1 und Vec 2 parallel
-		Gerade Vec2(Vec(0, 2000), Vec(3000, 2000).MakeUnit());	// Vec 3 und Vec 4 parallel
-		Gerade Vec3(Vec(0, 0), Vec(0, 2000).MakeUnit());
-		Gerade Vec4(Vec(3000, 0), Vec(3000, 2000).MakeUnit());
+		Gerade G1(Vec(0, 0), Vec(3000, 0).MakeUnit());// G1 und G2 parallel
+		Gerade G2(Vec(0, 2000), Vec(3000, 2000).MakeUnit());// G3 und G4 parallel
+		Gerade G3(Vec(0, 0), Vec(0, 2000).MakeUnit());
+		Gerade G4(Vec(3000, 0), Vec(3000, 2000).MakeUnit());
 		Vec o(Navi.getX(), Navi.getY());
 		Vec r(Navi.getOdometrie().getAngle());
 		Gerade Intersection(o, r);
 		//gedrehte Richtungsvektoren: Schnittpunkt mit Spielfeldvektoren prüfen
-		float a = Intersection.getIntersection(Vec1);
-		float b = Intersection.getIntersection(Vec2);
-		float c = Intersection.getIntersection(Vec3);
-		float d = Intersection.getIntersection(Vec4);
-		if (((timeCur - timeLast) >= intervalStop)){
-			if (Master && Navi.getJSON().getStopEnemy() ) {
-				if ((a >= 0) && (a <= 3000)){
-					if (a > b){
-						Navi.setTargetAngle(Navi.getOdometrie().getAngle() - 90);
-					}else{
-						Navi.setTargetAngle(Navi.getOdometrie().getAngle() + 90);
+		float a = abs(Intersection.getIntersection(G1));
+		float b = abs(Intersection.getIntersection(G2));
+		float c = abs(Intersection.getIntersection(G3));
+		float d = abs(Intersection.getIntersection(G4));
+		if (((timeCur - timeLast) >= intervalStop)) {
+			if (Master && Navi.getJSON().getStopEnemy()) {
+				if ((a >= 0) && (a <= 3000)) {
+					if (a >= b) {
+						Navi.setTargetAngle(
+								Navi.getOdometrie().getAngle() - 90);
+					} else {
+						Navi.setTargetAngle(
+								Navi.getOdometrie().getAngle() + 90);
 					}
-				}else{
-					if (c > d){
-						Navi.setTargetAngle(Navi.getOdometrie().getAngle() + 90);
-					}else{
-						Navi.setTargetAngle(Navi.getOdometrie().getAngle() - 90);
+				} else {
+					if (c >= d) {
+						Navi.setTargetAngle(
+								Navi.getOdometrie().getAngle() + 90);
+					} else {
+						Navi.setTargetAngle(
+								Navi.getOdometrie().getAngle() - 90);
 					}
 				}
-				currentState = turnToTargetAngle;
+				currentState = turnToAvoidTargetAngle;
 			} else {
 				if (!Navi.getJSON().getStopEnemy()) {
-					currentState = driveStraight;
+					currentState = driveStraightRegulated;
 				}
 
 			}
-		timeLast = timeCur;
+			timeLast = timeCur;
 		}
 	}
 		break;
