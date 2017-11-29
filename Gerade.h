@@ -15,6 +15,7 @@ public:
 	float calculateXInterception(float lambda);
 	float calculateYInterception(float lambda);
 
+	Vec getDirectVec(float i);
 	void testSchnittpunkt();
 };
 

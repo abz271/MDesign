@@ -32,7 +32,7 @@ void Navigation::UpdateData() {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
 	}
-	Odo.testOdometrie();
+	//Odo.testOdometrie();
 }
 
 float Navigation::getCalculateAngle(int x, int y) {

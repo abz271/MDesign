@@ -180,73 +180,93 @@ void StateMachine::evalStateMachine() {
 		Gerade G3(Vec(0, 0), Vec(0, 1));		// G3 und G4 parallel y-Achse
 		Gerade G4(Vec(3000, 0), Vec(0, 1));
 		Vec o(Navi.getX(), Navi.getY());
+		Serial.println(Navi.getOdometrie().getAngle());
 		Vec r(Navi.getOdometrie().getAngle());
 		Gerade Intersection(o, r);
 		//gedrehter Richtungsvektor: Schnittpunkt mit Spielfeldvektoren prüfen
-		float a = G1.getIntersection(Intersection);		// x-Wert g1 : y-Wert 0
-		float b = G2.getIntersection(Intersection);		// x-Wert g2 : y-Wert 2000
-		float c = G3.getIntersection(Intersection);		// y-Wert g3 : x-Wert 0
-		float d = G4.getIntersection(Intersection);		// y-Wert g4 : x-Wert 3000
-		float aimLength = 0;
-		float lengthA = 0;
-		float lengthB = 0;
-		float lengthC = 0;
-		float lengthD = 0;
+		float a = Intersection.getIntersection(G1);
+		float b = Intersection.getIntersection(G2);
+		float c = Intersection.getIntersection(G3);
+		float d = Intersection.getIntersection(G4);
 
-		if ((a >= 0) && (a <= 3000)) {
-			float PositionA[2] = {a, 0};
-			lengthA = Navi.getLengthToPosition(PositionA[0], PositionA[1]);
-			if (lengthA > aimLength){
-				aimLength = lengthA;
-				actualAvoidAngle = Navi.getCalculateAngle(PositionA[0], PositionA[1]);
+		Vec IntersectionG1 = Intersection.getDirectVec(a);
+		Vec IntersectionG2 = Intersection.getDirectVec(b);
+		Vec IntersectionG3 = Intersection.getDirectVec(c);
+		Vec IntersectionG4 = Intersection.getDirectVec(d);
+
+		Serial.print("Schnittpunkt G1x :");
+		Serial.println(IntersectionG1.getX());
+		Serial.print("Schnittpunkt G1y  :");
+		Serial.println(IntersectionG1.getY());
+		Serial.print("Schnittpunkt G2x :");
+		Serial.println(IntersectionG2.getX());
+		Serial.print("Schnittpunkt G2y  :");
+		Serial.println(IntersectionG2.getY());
+		Serial.print("Schnittpunkt G3x :");
+		Serial.println(IntersectionG3.getX());
+		Serial.print("Schnittpunkt G3y  :");
+		Serial.println(IntersectionG3.getY());
+		Serial.print("Schnittpunkt G4x :");
+		Serial.println(IntersectionG4.getX());
+		Serial.print("Schnittpunkt G4y  :");
+		Serial.println(IntersectionG4.getY());
+
+		float aimLength = 0;
+		float lengthG1 = IntersectionG1.getLength();
+		float lengthG2 = IntersectionG2.getLength();
+		float lengthG3 = IntersectionG3.getLength();
+		float lengthG4 = IntersectionG4.getLength();
+
+		if ((IntersectionG1.getY() >= 0) && (IntersectionG2.getY() <= 3000)) {
+			if ((IntersectionG1.getX() >= 0)
+					&& (IntersectionG1.getX() <= 2000)) {
+				if (lengthG1 > aimLength) {
+					aimLength = lengthG1;
+					actualAvoidAngle = IntersectionG1.getAngle();
+				}
 			}
 		}
-		if ((b >= 0) && (b <= 3000)) {
-			float PositionB[2] = {b, 2000};
-			lengthB = Navi.getLengthToPosition(PositionB[0], PositionB[1]);
-			if (lengthB > aimLength){
-				aimLength = lengthB;
-				actualAvoidAngle = Navi.getCalculateAngle(PositionB[0], PositionB[1]);
+		if ((IntersectionG2.getY() >= 0) && (IntersectionG2.getY() <= 3000)) {
+			if ((IntersectionG2.getX() >= 0)
+					&& (IntersectionG2.getX() <= 2000)) {
+				if (lengthG2 > aimLength) {
+					aimLength = lengthG2;
+					actualAvoidAngle = IntersectionG2.getAngle();
+				}
 			}
 		}
-		if ((c >= 0) && (c <= 2000)) {
-			float PositionC[2] = { 0, c};
-			lengthC = Navi.getLengthToPosition(PositionC[0], PositionC[1]);
-			if (lengthC > aimLength){
-				aimLength = lengthC;
-				actualAvoidAngle = Navi.getCalculateAngle(PositionC[0], PositionC[1]);
+		if ((IntersectionG3.getY() >= 0) && (IntersectionG3.getY() <= 3000)) {
+			if ((IntersectionG3.getX() >= 0)
+					&& (IntersectionG3.getX() <= 2000)) {
+				if (lengthG3 > aimLength) {
+					aimLength = lengthG3;
+					actualAvoidAngle = IntersectionG3.getAngle();
+				}
 			}
 		}
-		if ((d >= 0) && (d <= 2000)) {
-			float PositionD[2] = { 3000, d};
-			lengthD = Navi.getLengthToPosition(PositionD[0], PositionD[1]);
-			if (lengthD > aimLength){
-				aimLength = lengthD;
-				actualAvoidAngle = Navi.getCalculateAngle(PositionD[0], PositionD[1]);
+		if ((IntersectionG4.getY() >= 0) && (IntersectionG4.getY() <= 3000)) {
+			if ((IntersectionG4.getX() >= 0)
+					&& (IntersectionG4.getX() <= 2000)) {
+				if (lengthG4 > aimLength) {
+					aimLength = lengthG4;
+					actualAvoidAngle = IntersectionG4.getAngle();
+				}
 			}
 		}
 		Serial.print("aimLength  :");
 		Serial.println(aimLength);
-		Serial.print("lengthA  :");
-		Serial.println(lengthA);
-		Serial.print("lengthB  :");
-		Serial.println(lengthB);
-		Serial.print("lengthC  :");
-		Serial.println(lengthC);
-		Serial.print("lengthD  :");
-		Serial.println(lengthD);
+		Serial.print("lengthG1  :");
+		Serial.println(lengthG1);
+		Serial.print("lengthG2  :");
+		Serial.println(lengthG2);
+		Serial.print("lengthG3  :");
+		Serial.println(lengthG3);
+		Serial.print("lengthG4  :");
+		Serial.println(lengthG4);
 
 		Navi.setTargetAngle(actualAvoidAngle);
 		Serial.print("actualAvoidAngle  :");
 		Serial.println(actualAvoidAngle);
-		Serial.print("a  :");
-		Serial.println(a);
-		Serial.print("b  :");
-		Serial.println(b);
-		Serial.print("c  :");
-		Serial.println(c);
-		Serial.print("d  :");
-		Serial.println(d);
 
 		if (((timeCur - timeLast) >= intervalStop)) {
 			if (Master && Navi.getJSON().getStopEnemy()) {

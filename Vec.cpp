@@ -14,13 +14,7 @@ Vec::Vec(float x, float y) {
     this->x = x;
     this->y = y;
 }
-/*
-Vec Vec::MakeUnit(){
-	float l = getLength();
-	Vec b(x/l,y/l);
-	return b;
-}
-*/
+
 Vec Vec::operator+(Vec v) {
     Vec r(x + v.x, y + v.y);
     return r;
@@ -32,6 +26,14 @@ float Vec::getLength() {
 
 float Vec::getAngle() {
     return (atan2(y, x) *180 / M_PI);
+}
+
+float Vec::getX(){
+	return x;
+}
+
+float Vec::getY(){
+	return y;
 }
 
 void Vec::setX(float x) {

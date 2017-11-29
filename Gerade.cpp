@@ -19,3 +19,8 @@ float Gerade::getIntersection(Gerade g) {
 	return Intersection;
 }
 
+Vec Gerade::getDirectVec(float i){
+	Vec result(o.x+i*r.x, o.y+i*r.y);
+	return result;
+}
+
