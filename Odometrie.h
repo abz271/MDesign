@@ -13,7 +13,7 @@ private:
 	// Position
     float x_odometrie;
     float y_odometrie;
-    float alpha_odometrie;
+    float alpha_odometrie = 90;
 
 
     // Rad Geometrie

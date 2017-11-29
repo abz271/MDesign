@@ -14,13 +14,13 @@ Vec::Vec(float x, float y) {
     this->x = x;
     this->y = y;
 }
-
+/*
 Vec Vec::MakeUnit(){
 	float l = getLength();
 	Vec b(x/l,y/l);
 	return b;
 }
-
+*/
 Vec Vec::operator+(Vec v) {
     Vec r(x + v.x, y + v.y);
     return r;

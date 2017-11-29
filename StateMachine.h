@@ -17,15 +17,15 @@ private:
 	int speedStop = 0;
 
 	// Ausweichverhalten
-    bool Master = true;
-    unsigned long currentQuarter = 0;
-    float actualAvoidAngle = 0;
+	bool Master = true;
+	unsigned long currentQuarter = 0;
+	float actualAvoidAngle = 0;
 
-    // Zeitverhalten
-    unsigned long timeCur = millis();
-    const unsigned long interval = 1000;
-    const unsigned long intervalStop = 5000;
-    const unsigned long intervalDrive = 3000;
+	// Zeitverhalten
+	unsigned long timeCur = millis();
+	const unsigned long interval = 1000;
+	const unsigned long intervalStop = 5000;
+	const unsigned long intervalDrive = 3000;
 
 public:
 
@@ -36,7 +36,5 @@ public:
 
 };
 
-
 #endif	/* STATEMACHINE_H */
-
 

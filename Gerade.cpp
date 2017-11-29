@@ -3,7 +3,7 @@
 #include "Vec.h"
 
 Gerade::Gerade() {
-
+	k = 0;
 }
 
 Gerade::Gerade(Vec o, Vec r) :
@@ -19,14 +19,3 @@ float Gerade::getIntersection(Gerade g) {
 	return Intersection;
 }
 
-void Gerade::testSchnittpunkt() {
-	Vec o(1500, 1000);					//
-	Vec r(1, 0);							//		x->			^
-	Gerade test(o, r);					//					I
-	Gerade Vec1(Vec(0, 0), Vec(2000, 0));	//					x
-	int a = 1;
-	if (a == 1) {
-		Serial.println(test.getIntersection(Vec1));
-		a = 2;
-	}
-}

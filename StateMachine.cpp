@@ -1,6 +1,6 @@
 #include "Statemachine.h"
+#include "Navigation.h"
 #include "Gerade.h"
-#include "Vec.h"
 #include <Arduino.h>
 enum states {
 	initState,
@@ -14,7 +14,7 @@ enum states {
 	avoidCrash,
 	finished
 };
-static enum states currentState = nextPoint;
+static enum states currentState = avoidCrash;
 static unsigned long timeLast = millis();
 static unsigned long timeStop = millis();
 
@@ -49,6 +49,8 @@ void StateMachine::evalStateMachine() {
 	case driveShortlyStraight: {
 		Navi.getMotor().driveStraight();
 	}
+		break;
+
 	case startUp: {
 		//Serial.println("In startUp");
 		Navi.driveToTargetPosition();
@@ -121,7 +123,7 @@ void StateMachine::evalStateMachine() {
 			currentState = driveShortlyStraight;
 		}
 	}
-	break;
+		break;
 	case startUp: {
 		if (Navi.getJSON().getStopEnemy()) {
 			Navi.setSpeed(speedStop);
@@ -135,13 +137,13 @@ void StateMachine::evalStateMachine() {
 		break;
 
 	case driveShortlyStraight: {
-		if ((timeCur - timeLast) >= intervalDrive){
+		if ((timeCur - timeLast) >= intervalDrive) {
 			Navi.setSpeed(speedmaxturn);
 			timeLast = timeCur;
 			currentState = nextPoint;
 		}
 	}
-	break;
+		break;
 	case driveStraightRegulated: {
 		if (Navi.getJSON().getStopEnemy()) {
 			Navi.setSpeed(speedStop);
@@ -159,7 +161,6 @@ void StateMachine::evalStateMachine() {
 	case stopMotor: {
 		if (Navi.getJSON().getStopEnemy()) {
 			currentQuarter = Navi.getCurrentQuarter();
-			actualAvoidAngle = Navi.getOdometrie().getAngle();
 			currentState = avoidCrash;
 		} else if (Navi.getPosition() == Navi.getMaximalPosition()) {
 			// Letzte Position erreicht?
@@ -174,46 +175,92 @@ void StateMachine::evalStateMachine() {
 	}
 		break;
 	case avoidCrash: {
-		Gerade G1(Vec(0, 0), Vec(3000, 0).MakeUnit());// G1 und G2 parallel
-		Gerade G2(Vec(0, 2000), Vec(3000, 2000).MakeUnit());// G3 und G4 parallel
-		Gerade G3(Vec(0, 0), Vec(0, 2000).MakeUnit());
-		Gerade G4(Vec(3000, 0), Vec(3000, 2000).MakeUnit());
+		Gerade G1(Vec(0, 0), Vec(1, 0));		// G1 und G2 parallel x-Achse
+		Gerade G2(Vec(0, 2000), Vec(1, 0));
+		Gerade G3(Vec(0, 0), Vec(0, 1));		// G3 und G4 parallel y-Achse
+		Gerade G4(Vec(3000, 0), Vec(0, 1));
 		Vec o(Navi.getX(), Navi.getY());
 		Vec r(Navi.getOdometrie().getAngle());
 		Gerade Intersection(o, r);
-		//gedrehte Richtungsvektoren: Schnittpunkt mit Spielfeldvektoren prüfen
-		float a = abs(Intersection.getIntersection(G1));
-		float b = abs(Intersection.getIntersection(G2));
-		float c = abs(Intersection.getIntersection(G3));
-		float d = abs(Intersection.getIntersection(G4));
+		//gedrehter Richtungsvektor: Schnittpunkt mit Spielfeldvektoren prüfen
+		float a = G1.getIntersection(Intersection);		// x-Wert g1 : y-Wert 0
+		float b = G2.getIntersection(Intersection);		// x-Wert g2 : y-Wert 2000
+		float c = G3.getIntersection(Intersection);		// y-Wert g3 : x-Wert 0
+		float d = G4.getIntersection(Intersection);		// y-Wert g4 : x-Wert 3000
+		float aimLength = 0;
+		float lengthA = 0;
+		float lengthB = 0;
+		float lengthC = 0;
+		float lengthD = 0;
+
+		if ((a >= 0) && (a <= 3000)) {
+			float PositionA[2] = {a, 0};
+			lengthA = Navi.getLengthToPosition(PositionA[0], PositionA[1]);
+			if (lengthA > aimLength){
+				aimLength = lengthA;
+				actualAvoidAngle = Navi.getCalculateAngle(PositionA[0], PositionA[1]);
+			}
+		}
+		if ((b >= 0) && (b <= 3000)) {
+			float PositionB[2] = {b, 2000};
+			lengthB = Navi.getLengthToPosition(PositionB[0], PositionB[1]);
+			if (lengthB > aimLength){
+				aimLength = lengthB;
+				actualAvoidAngle = Navi.getCalculateAngle(PositionB[0], PositionB[1]);
+			}
+		}
+		if ((c >= 0) && (c <= 2000)) {
+			float PositionC[2] = { 0, c};
+			lengthC = Navi.getLengthToPosition(PositionC[0], PositionC[1]);
+			if (lengthC > aimLength){
+				aimLength = lengthC;
+				actualAvoidAngle = Navi.getCalculateAngle(PositionC[0], PositionC[1]);
+			}
+		}
+		if ((d >= 0) && (d <= 2000)) {
+			float PositionD[2] = { 3000, d};
+			lengthD = Navi.getLengthToPosition(PositionD[0], PositionD[1]);
+			if (lengthD > aimLength){
+				aimLength = lengthD;
+				actualAvoidAngle = Navi.getCalculateAngle(PositionD[0], PositionD[1]);
+			}
+		}
+		Serial.print("aimLength  :");
+		Serial.println(aimLength);
+		Serial.print("lengthA  :");
+		Serial.println(lengthA);
+		Serial.print("lengthB  :");
+		Serial.println(lengthB);
+		Serial.print("lengthC  :");
+		Serial.println(lengthC);
+		Serial.print("lengthD  :");
+		Serial.println(lengthD);
+
+		Navi.setTargetAngle(actualAvoidAngle);
+		Serial.print("actualAvoidAngle  :");
+		Serial.println(actualAvoidAngle);
+		Serial.print("a  :");
+		Serial.println(a);
+		Serial.print("b  :");
+		Serial.println(b);
+		Serial.print("c  :");
+		Serial.println(c);
+		Serial.print("d  :");
+		Serial.println(d);
+
 		if (((timeCur - timeLast) >= intervalStop)) {
 			if (Master && Navi.getJSON().getStopEnemy()) {
-				if ((a >= 0) && (a <= 3000)) {
-					if (a >= b) {
-						Navi.setTargetAngle(
-								Navi.getOdometrie().getAngle() - 90);
-					} else {
-						Navi.setTargetAngle(
-								Navi.getOdometrie().getAngle() + 90);
-					}
-				} else {
-					if (c >= d) {
-						Navi.setTargetAngle(
-								Navi.getOdometrie().getAngle() + 90);
-					} else {
-						Navi.setTargetAngle(
-								Navi.getOdometrie().getAngle() - 90);
-					}
-				}
+				timeLast = timeCur;
 				currentState = turnToAvoidTargetAngle;
 			} else {
 				if (!Navi.getJSON().getStopEnemy()) {
+					timeLast = timeCur;
 					currentState = driveStraightRegulated;
 				}
 
 			}
-			timeLast = timeCur;
 		}
+
 	}
 		break;
 
