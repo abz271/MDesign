@@ -14,7 +14,7 @@ Odometrie::Odometrie() {
 	// bis jetzt nur Testwerte:
 	x_odometrie = 0;
 	y_odometrie = 0;
-	alpha_odometrie = 0;
+	//alpha_odometrie = 0;
 
 
 }
@@ -32,8 +32,8 @@ void Odometrie::setPosition(int x, int y) {
 void Odometrie::updateOdometrie() {
 
 	// Variablen
-	float leftWheelChange;
-	float rightWheelChange;
+	float leftWheelChange = 0;
+	float rightWheelChange = 0;
 	float d_center = 0; // relative Bewegung der Mitte des Roboters
 
 	// Werte updaten, aktuelle Werte aus den Encodern holen
@@ -48,8 +48,7 @@ void Odometrie::updateOdometrie() {
 	y_odometrie += d_center * sin((alpha_odometrie * PI) / 180);
 
 	//Winkel des Fahrzeugs berechnen und Attribute updaten
-	alpha_odometrie += (-1.0 * (leftWheelChange + rightWheelChange) * 180)
-			/ (Achsabstand * PI);
+	alpha_odometrie += (-1.0 * (leftWheelChange + rightWheelChange) * 180) / (Achsabstand * PI);
 }
 
 float Odometrie::getAngle() {

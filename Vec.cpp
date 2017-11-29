@@ -2,8 +2,8 @@
 #include "Vec.h"
 
 Vec::Vec() {
-    x = 0.0;
-    y = 0.0;
+    x = 0;
+    y = 0;
 
 }
 Vec::Vec(float angle){

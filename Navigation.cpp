@@ -2,10 +2,8 @@
 #include "Navigation.h"
 #include "Motor.h"
 #include <Arduino.h>
-// Allgemeine Todos
-// TODO: Timer für das automatischen Beenden der Fahrt
-// TODO: Beacons nicht detektieren.
-// TODO:
+
+
 Navigation::Navigation(){
 	Position = 0;
 }
@@ -142,6 +140,9 @@ void Navigation::setSpeed(int speed){
 }
 
 void Navigation::setTargetAngle(float angle) {
+	if (angle >= 360.0){
+		angle -= 360.0;
+	}
 	targetAngle = angle;
 }
 
