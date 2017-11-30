@@ -11,19 +11,19 @@
 Kommunikation::Kommunikation() {
 
 	// Verbindung als Master aufbauen
-	// TODO: für Testzwecke auch als Slave, Adresse einfügen
+	// TODO: fÃ¼r Testzwecke auch als Slave, Adresse einfÃ¼gen
 	Wire.begin();
 
 }
 
 /*
- * Fragt die Daten über den i^2c Bus von der Hardware Gruppe an
- * und gibt sie per Reference zurück
+ * Fragt die Daten Ã¼ber den i^2c Bus von der Hardware Gruppe an
+ * und gibt sie per Reference zurÃ¼ck
  * i^2c Bus Methode
  */
 void Kommunikation::DataFromHardware(String& comString) {
 
-	// TODO: String größe ermitteln aus funktion
+	// TODO: String grÃ¶ÃŸe ermitteln aus funktion
 	// Kommunikation starten, Daten anfragen
 
 	Wire.requestFrom(hardwareAddress, stringLength);
@@ -41,11 +41,11 @@ void Kommunikation::DataFromHardware(String& comString) {
 }
 
 /*
- * Sendet sie Daten für dei Moteren an die Hardware Gruppe
+ * Sendet sie Daten fÃ¼r dei Moteren an die Hardware Gruppe
  * i^2c Bus Methode
  */
 
-// TODO: Methode wird nicht mehr genutzt. Kann gelöscht werden?
+// TODO: Methode wird nicht mehr genutzt. Kann gelÃ¶scht werden?
 void Kommunikation::DataToHardware(String comString) {
 
 	// Char Array anlegen
@@ -55,7 +55,7 @@ void Kommunikation::DataToHardware(String comString) {
 	// Kommunikation beginnen
 	Wire.beginTransmission(hardwareAddress);
 
-	// Daten übertragen, als normales Char Array übertragen
+	// Daten Ã¼bertragen, als normales Char Array Ã¼bertragen
 	Wire.write(charComString);
 
 	// Kommunikation beenden
@@ -64,36 +64,37 @@ void Kommunikation::DataToHardware(String comString) {
 }
 
 /*
- * Fragt die Daten über den i2c Bus von der Positions Gruppe an
+ * Fragt die Daten Ã¼ber den i2c Bus von der Positions Gruppe an
  * i2c Methode
  */
-void Kommunikation::DataFromPosition(String& comString) {
+bool Kommunikation::getPosition(int& xPos, int& yPos) {
 
-	// TODO: String größe ermitteln aus funktion
-	// Kommunikation starten, Daten anfragen
+	// Buffer fÃ¼r den Json String
+	StaticJsonBuffer<100> jsonBuffer;
+	String comString;
 
-	Wire.requestFrom(positionAddress, stringLength);
+	// Daten von dem Positionsteam abfragen
+	DataFromPosition(comString);
 
-	// Char array anlegen
-	char c = 0;
+	// Json Object aus dem Ã¼bergebenen string erstellen
+	JsonObject& root = jsonBuffer.parseObject(comString);
 
-	// Daten einlesen
-	while (Wire.available()) {
+	// TODO: Nach Ãœbersetzungsfehler prÃ¼fen
 
-		// Chars nacheinander empfangen und in ein char array schreiben
-		c = Wire.read();
-		comString += c;
-	}
+	// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
+	xPos = root["xPos"];
+	yPos = root["yPos"];
+	return root["sigOk"];
 
 }
 
 /*
- * Gibt einen bool zurück wenn sich ein Gegner in Reichweise der Sensoren befindet
- * Diese Methode kümmert sich um das Übersetzen des JSONs
+ * Gibt einen bool zurÃ¼ck wenn sich ein Gegner in Reichweise der Sensoren befindet
+ * Diese Methode kÃ¼mmert sich um das Ãœbersetzen des JSONs
  */
 bool Kommunikation::getStopEnemy() {
 
-	// Buffer für den Json String
+	// Buffer fÃ¼r den Json String
 	StaticJsonBuffer<100> jsonBuffer;
 
 	// Variablen
@@ -115,12 +116,12 @@ bool Kommunikation::getStopEnemy() {
 }
 
 /*
- *	Gibt einen Bool zurück, wenn das Signal des Positionsbestimmungsteams gut ist.
+ *	Gibt einen Bool zurÃ¼ck, wenn das Signal des Positionsbestimmungsteams gut ist.
  *  Wird in den Funktionen genutzt, um Daten zu aktualisieren und zu kalibrieren
  */
-
+ /*
 bool Kommunikation::getSignalUsefull() {
-	// Buffer für den Json String
+	// Buffer fÃ¼r den Json String
 	StaticJsonBuffer<100> jsonBuffer;
 
 	// Variablen
@@ -140,35 +141,64 @@ bool Kommunikation::getSignalUsefull() {
 	return result;
 
 }
-
+*/
 /*
- * Gibt die aktuelle Position der Positionsgruppe per Referenze zurück
- * Außerdem wird ein bool zurück gegeben ob die Information verwendbar ist oder nicht
- * Diese Methode kümmert sich um das Übersetzen des JSONs
+ * Gibt die aktuelle Position der Positionsgruppe per Referenze zurÃ¼ck
+ * AuÃŸerdem wird ein bool zurÃ¼ck gegeben ob die Information verwendbar ist oder nicht
+ * Diese Methode kÃ¼mmert sich um das Ãœbersetzen des JSONs
  */
 void Kommunikation::getPosition(int& xPos, int& yPos) {
 
-	// Buffer für den Json String
+	// Buffer fÃ¼r den Json String
 	StaticJsonBuffer<100> jsonBuffer;
 	String comString;
 
 	// Daten von dem Positionsteam abfragen
 	DataFromPosition(comString);
 
-	// Json Object aus dem übergebenen string erstellen
+	// Json Object aus dem Ã¼bergebenen string erstellen
 	JsonObject& root = jsonBuffer.parseObject(comString);
 
-	// TODO: Nach Übersetzungsfehler prüfen
+	// TODO: Nach Ãœbersetzungsfehler prÃ¼fen
 
-	// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
+	// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
 	xPos = root["xPos"];
 	yPos = root["yPos"];
 
 }
 
+void Kommunikation::testKommunikation(){
+	static unsigned long time = millis();
+
+	bool signalOk = true;
+	bool enemyDet = false;
+	int x, y = -1000;
+
+	if(millis() > time + 100){
+		time = millis();
+
+
+		 signalOk = getPosition(x, y);
+		 enemyDet = getStopEnemy();
+
+		 Serial.print("SigOk:  ");
+		 Serial.print(signalOk);
+		 Serial.print("   xPos:  ");
+		 Serial.print(x);
+		 Serial.print("   yPos:   ");
+		 Serial.print(y);
+		 Serial.print("   Genger vorraus:   ");
+		 Serial.print(enemyDet);
+		 Serial.println();
+
+
+	}
+
+}
+
 /*
  * Master testen
- * Der Master empfängt etwas
+ * Der Master empfÃ¤ngt etwas
  */
 void Kommunikation::testAsMaster() {
 
@@ -198,12 +228,12 @@ void Kommunikation::testAsMaster() {
 			comString += c;
 		}
 
-		// Buffer für den Json String
+		// Buffer fÃ¼r den Json String
 		StaticJsonBuffer<100> jsonBuffer;
 
-		// Json Object aus dem übergebenen string erstellen
+		// Json Object aus dem Ã¼bergebenen string erstellen
 		JsonObject& root = jsonBuffer.parseObject(comString);
-		// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
+		// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
 
 		float left = root["left"];
 		float right = root["right"];
