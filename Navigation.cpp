@@ -23,8 +23,10 @@ Kommunikation& Navigation::getJSON(){
 void Navigation::UpdateData() {
 	Odo.updateOdometrie();
 	Moto.updateVelocity();
-	if (JSON.getSignalUsefull()) {
-		JSON.getPosition(x_aktuell, y_aktuell);
+	int xFromPosition, yFromPosition;
+	if (JSON.getPosition(xFromPosition, yFromPosition) ) {
+		x_aktuell = xFromPosition;
+		y_aktuell = yFromPosition;
 		Odo.setPosition(x_aktuell, y_aktuell);
 	} else {
 		x_aktuell = Odo.getX_position();
@@ -42,7 +44,7 @@ float Navigation::getCalculateAngle(int x, int y) {
 	return Winkel;
 }
 
-// Berechnet die VektorlÃ¤nge zwischen dem aktuellem Standort und dem Zielpunkt.
+// Berechnet die VektorlÃƒÂ¤nge zwischen dem aktuellem Standort und dem Zielpunkt.
 // Wird evtl nicht mehr gebraucht
 float Navigation::getLengthToPosition(int x, int y) {
 	int delta_x = x - x_aktuell;
@@ -74,7 +76,7 @@ void Navigation::driveToTargetPosition(){
 	// implementierung P-Regler
 	controlDeviation = getTargetAngle();	// Soll Winkel
 	actualDeviation = Odo.getAngle();		// Ist Winkel
-	//Reglerdifferenz verstärken und übertragen
+	//Reglerdifferenz verstÃ¤rken und Ã¼bertragen
 	differenceDeviation = (controlDeviation - actualDeviation) * amplifierKp;
 	Moto.driveStraightRegulated(speed, differenceDeviation);
 }
@@ -150,7 +152,7 @@ void Navigation::setNextPosition(){
 	Position ++;
 }
 
-// Gibt Vorzeichen des übergebenen Wertes zurück
+// Gibt Vorzeichen des Ã¼bergebenen Wertes zurÃ¼ck
 int Navigation::signum(float sign){
 	int NumberSign = 0;
 	if (sign > 0){
