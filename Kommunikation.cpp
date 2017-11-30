@@ -64,8 +64,33 @@ void Kommunikation::DataToHardware(String comString) {
 }
 
 /*
- * Fragt die Daten Ã¼ber den i2c Bus von der Positions Gruppe an
+ * Fragt die Daten über den i2c Bus von der Positions Gruppe an
  * i2c Methode
+ */
+void Kommunikation::DataFromPosition(String& comString) {
+
+	// TODO: String größe ermitteln aus funktion
+	// Kommunikation starten, Daten anfragen
+
+	Wire.requestFrom(positionAddress, stringLength);
+
+	// Char array anlegen
+	char c = 0;
+
+	// Daten einlesen
+	while (Wire.available()) {
+
+		// Chars nacheinander empfangen und in ein char array schreiben
+		c = Wire.read();
+		comString += c;
+	}
+
+}
+
+/*
+ * Gibt die aktuelle Position der Positionsgruppe per Referenze zurück
+ * Außerdem wird ein bool zurück gegeben ob die Information verwendbar ist oder nicht
+ * Diese Methode kümmert sich um das Übersetzen des JSONs
  */
 bool Kommunikation::getPosition(int& xPos, int& yPos) {
 
@@ -142,30 +167,6 @@ bool Kommunikation::getSignalUsefull() {
 
 }
 */
-/*
- * Gibt die aktuelle Position der Positionsgruppe per Referenze zurÃ¼ck
- * AuÃŸerdem wird ein bool zurÃ¼ck gegeben ob die Information verwendbar ist oder nicht
- * Diese Methode kÃ¼mmert sich um das Ãœbersetzen des JSONs
- */
-void Kommunikation::getPosition(int& xPos, int& yPos) {
-
-	// Buffer fÃ¼r den Json String
-	StaticJsonBuffer<100> jsonBuffer;
-	String comString;
-
-	// Daten von dem Positionsteam abfragen
-	DataFromPosition(comString);
-
-	// Json Object aus dem Ã¼bergebenen string erstellen
-	JsonObject& root = jsonBuffer.parseObject(comString);
-
-	// TODO: Nach Ãœbersetzungsfehler prÃ¼fen
-
-	// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
-	xPos = root["xPos"];
-	yPos = root["yPos"];
-
-}
 
 void Kommunikation::testKommunikation(){
 	static unsigned long time = millis();
