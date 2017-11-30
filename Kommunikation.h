@@ -2,7 +2,7 @@
 #define KOMMUNIKATION_H
 #include <Arduino.h>
 
-// TODO: Die Byte Längen sind alle noch auf mindestens 45 zu setzen
+// TODO: Die Byte LÃ¤ngen sind alle noch auf mindestens 45 zu setzen
 class Kommunikation {
 private:
 
@@ -18,14 +18,15 @@ private:
 public:
 
 	Kommunikation();
-	bool getSignalUsefull();
+	//bool getSignalUsefull();
 	bool getStopEnemy();
-	void getPosition(int& xPos, int& yPos);
+	bool getPosition(int& xPos, int& yPos);
 
 	// Zum testen Objekt im Robi.cpp anlegen und dann
 	// diese Funktion einfach im loop laufen lassen
 	void testAsMaster();
 	void testAsSlave();
+	void testKommunikation();
 
 
 
