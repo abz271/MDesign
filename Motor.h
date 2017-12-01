@@ -14,7 +14,7 @@ private:
 	unsigned char in2 = 23;		// Drehrichtung	LOW		HIGH	LOW
 	// Right Wheel
 	unsigned char in3 = 24;		// Drehrichtung
-	unsigned char in4 = 25;		// Drehrichtung
+	unsigned char in4 = 25;			// Drehrichtung
 	unsigned char pwmB = 11;	// Pwm Signal, steuert Motorgeschwindigkeit
 
 	// Geschwindigkeiten der Räder

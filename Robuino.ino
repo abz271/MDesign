@@ -12,6 +12,6 @@ void setup() {
 
 void loop() {
 
-	//StateM.UpdateData();
+	StateM.UpdateData();
 	StateM.evalStateMachine();
 }

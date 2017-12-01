@@ -20,7 +20,7 @@ private:
     // Attribute für die Positionsbestimmung
     int X_Koordinaten[5] = {0, 1000, 0, 0, 25};
     int Y_Koordinaten[5] = {1000, 1000, 0, 0, 9};
-    int x_aktuell = 200; 		// Startwert in x-Richtung
+    int x_aktuell = 1501; 		// Startwert in x-Richtung
     int y_aktuell = 100; 		// Startwert in y-Richtung
     int maxPosition = 2;	// Maximal 5 Positionen
     int Position;				// Aktueller Anfahrpunkt
@@ -31,10 +31,6 @@ private:
 	float amplifierKp = 10;
 	float safetyRadius = 30;
     float e = 0.0;
-    // Ausweichverhalten
-	unsigned long currentQuarter= 1;
-	long AreaWidth = 2000;
-	long AreaHigh = 3000;
 
 public:	// Allgemeines
     Navigation();

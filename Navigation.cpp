@@ -6,6 +6,8 @@
 
 Navigation::Navigation(){
 	Position = 0;
+	Odo.setXposition(x_aktuell);
+	Odo.setYposition(y_aktuell);
 }
 
 Odometrie& Navigation::getOdometrie(){
@@ -32,7 +34,7 @@ void Navigation::UpdateData() {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
 	}
-	//Odo.testOdometrie();
+	Odo.testOdometrie();
 }
 
 float Navigation::getCalculateAngle(int x, int y) {
@@ -120,23 +122,7 @@ float Navigation::getSafetyRadius(){
 int Navigation::getMaximalPosition(){
 	return maxPosition;
 }
-int Navigation::getCurrentQuarter(){
-	// TODO: Ausweichverhalten implementieren in Navigation
-	if (x_aktuell < AreaWidth/2){
-		if (y_aktuell < AreaHigh/2){
-			currentQuarter = 1;	// Aktueller Aufenthalt in Quartal 1: x=0, y=0 bis x=999, y = 1499
-		}else{
-			currentQuarter = 2;	// Aktueller Aufenthalt in Quartal 2: x=0, y=1500 bis x=999, y = 3000
-		}
-	}else{
-		if (y_aktuell < AreaHigh/2){
-			currentQuarter = 3;	// Aktueller Aufenthalt in Quartal 3: x=1000, y=0 bis x=2000, y = 1499
-		}else{
-			currentQuarter = 4;	// Aktueller Aufenthalt in Quartal 4: x=1000, y=1500 bis x=2000, y = 3000
-		}
-	}
-	return currentQuarter;
-}
+
 void Navigation::setSpeed(int speed){
 	this->speed = speed;
 }

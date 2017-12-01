@@ -6,9 +6,8 @@
 // Allgemeine Todos
 // TODO: Überhaupt nötig? Beacons nicht detektieren.
 // TODO: Testen: Testen der Odometrie ohne Mopped
-// TODO: Testen: Timer für das automatischen Beenden der Fahrt
 // TODO: Testen: Ausweichverhalten
-// TODO: Testen: Drehung auf Stelle optimieren
+// TODO: Testen: Wenn Zeit: Drehung auf Stelle optimieren
 // TODO: Testen: Kommunikation
 
 enum states {
@@ -21,7 +20,8 @@ enum states {
 	driveStraightRegulated,
 	stopMotor,
 	avoidCrash,
-	finished
+	finished,
+	finishedOutOfTime
 };
 static enum states currentState = avoidCrash;
 static unsigned long timeLast = millis();
@@ -40,7 +40,8 @@ void StateMachine::UpdateData() {
 
 void StateMachine::evalStateMachine() {
 	if ((playTime - timeToPlay) >= intervalPlaytime){
-		currentState = finished;
+		Navi.setSpeed(speedStop);
+		currentState = finishedOutOfTime;
 		// TODO: Testen
 	}
 	switch (currentState) {
@@ -52,25 +53,30 @@ void StateMachine::evalStateMachine() {
 			break;
 		case turnToTargetAngle: {
 			Navi.turnToTargetAngle();
+			Serial.println("turnToTargetAngle");
 		}
 			break;
 		case turnToAvoidTargetAngle: {
 			Navi.turnToTargetAngle();
+			Serial.println("turnToAvoidTargetAngle");
 		}
 			break;
 		case driveShortlyStraight: {
 			Navi.getMotor().driveStraight();
+			Serial.println("driveShortlyStraight");
 		}
 			break;
 
 		case startUp: {
 			Navi.driveToTargetPosition();
 			Navi.setSpeed(60);
+			Serial.println("startUp");
 		}
 			break;
 		case driveStraightRegulated: {
 			Serial.println(Navi.getOdometrie().getAngle());
 			Navi.driveToTargetPosition();
+			Serial.println("driveStraightRegulated");
 		}
 			break;
 		case stopMotor: {
@@ -87,6 +93,11 @@ void StateMachine::evalStateMachine() {
 		case finished: {
 			Navi.setTargetAngle(90);
 			Navi.turnToTargetAngle();
+		}
+			break;
+		case finishedOutOfTime: {
+			Navi.getMotor().stop();
+
 		}
 			break;
 	}
@@ -182,9 +193,10 @@ void StateMachine::evalStateMachine() {
 			Gerade G2(Vec(0, 2000), Vec(1, 0));
 			Gerade G3(Vec(0, 0), Vec(0, 1));		// G3 und G4 parallel y-Achse
 			Gerade G4(Vec(3000, 0), Vec(0, 1));
-			Vec o(Navi.getX(), Navi.getY());
+			//Vec o(Navi.getX(), Navi.getY());
+			Vec o(1501, 100);
+			Vec r(90);
 			Serial.println(Navi.getOdometrie().getAngle());
-			Vec r(45);
 			//Vec r(Navi.getOdometrie().getAngle());
 			Gerade Intersection(o, r);
 			//gedrehter Richtungsvektor: Schnittpunkt mit Spielfeldvektoren prüfen
@@ -193,6 +205,15 @@ void StateMachine::evalStateMachine() {
 			b = Intersection.getIntersection(G2);
 			c = Intersection.getIntersection(G3);
 			d = Intersection.getIntersection(G4);
+
+			Serial.print("a  :");
+			Serial.println(a);
+			Serial.print("b  :");
+			Serial.println(b);
+			Serial.print("c :");
+			Serial.println(c);
+			Serial.print("d :");
+			Serial.println(d);
 
 			Vec IntersectionG1 = Intersection.getDirectVec(a);
 			Vec IntersectionG2 = Intersection.getDirectVec(b);
@@ -223,8 +244,8 @@ void StateMachine::evalStateMachine() {
 					IntersectionG2.getY());
 			float lengthG3 = Navi.getLengthToPosition(IntersectionG3.getX(),
 					IntersectionG3.getY());
-			float lengthG4 = Navi.getLengthToPosition(IntersectionG4.getX(),
-					IntersectionG4.getY());
+			float lengthG4 = Navi.getLengthToPosition(3000,
+					100);
 
 			if ((IntersectionG1.getY() >= 0) && (IntersectionG2.getY() <= 2000)) {
 				if ((IntersectionG1.getX() >= 0)
@@ -285,11 +306,13 @@ void StateMachine::evalStateMachine() {
 			if (((timeCur - timeLast) >= intervalStop)) {
 				if (Master && Navi.getJSON().getStopEnemy()) {
 					timeLast = timeCur;
+					Navi.setSpeed(speedmaxturn);
 					currentState = turnToAvoidTargetAngle;
 				} else {
 					if (!Navi.getJSON().getStopEnemy()) {
 						timeLast = timeCur;
-						currentState = driveStraightRegulated;
+						Navi.setSpeed(speedStartUp);
+						currentState = startUp;
 					}
 
 				}
@@ -299,6 +322,10 @@ void StateMachine::evalStateMachine() {
 			break;
 
 		case finished: {
+
+		}
+			break;
+		case finishedOutOfTime: {
 
 		}
 			break;

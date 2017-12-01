@@ -19,6 +19,13 @@ Odometrie::Odometrie() {
 
 }
 
+void Odometrie::setXposition(int x_odometrie){
+	this->x_odometrie = x_odometrie;
+}
+
+void Odometrie::setYposition(int y_odometrie){
+	this->y_odometrie = y_odometrie;
+}
 /*
  * Funktion setPosition() aktualisiert die Positionsdaten aus der Odometrie
  * mit den Daten aus dem Positionsbestimmungsteam
@@ -44,6 +51,7 @@ void Odometrie::updateOdometrie() {
 
 	// Ver�nderungen der x und y Position des Fahrzeugs
 	// Updaten der Attribute
+
 	x_odometrie += d_center * cos((alpha_odometrie * PI) / 180);
 	y_odometrie += d_center * sin((alpha_odometrie * PI) / 180);
 
@@ -77,8 +85,8 @@ void Odometrie::getDiffWheelDistance(float& leftWheelChange,
 		float& rightWheelChange) {
 
 	// Variablen für Winkek
-	float leftRotaryChange;
-	float rightRotaryChange;
+	float leftRotaryChange = 0.0;
+	float rightRotaryChange = 0.0;
 
 	// Winkelwerte mit getRotaryChange abrufen
 	getDiffWheelAngle(leftRotaryChange, rightRotaryChange);
@@ -96,8 +104,8 @@ void Odometrie::getDiffWheelAngle(float& leftRotaryChange,
 		float& rightRotaryChange) {
 
 	// Variablen für die Encoder Werte anlegen
-	float leftRotary;
-	float rightRotary;
+	float leftRotary = 0.0;
+	float rightRotary = 0.0;
 
 	// Werte der Encoder abrufen
 	leftRotary = leftWheel.read();

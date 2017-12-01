@@ -25,8 +25,8 @@ private:
 	unsigned long playTime = millis();
 	const unsigned long interval = 1000;
 	const unsigned long intervalStop = 5000;
-	const unsigned long intervalDrive = 3000;
-	const unsigned long intervalPlaytime = 500000;
+	const unsigned long intervalDrive = 1000;
+	const unsigned long intervalPlaytime = 25000;
 
 public:
 

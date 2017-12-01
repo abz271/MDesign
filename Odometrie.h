@@ -17,10 +17,10 @@ private:
 
 
     // Rad Geometrie
-    const float radDurchmesserLinks = 46.9;
+    const float radDurchmesserLinks = 49.35;
     const float radUmfangLinks = radDurchmesserLinks * PI;
 
-    const float radDurchmesserRechts = 46.1;
+    const float radDurchmesserRechts = 49.25;
     const float radUmfangRechts = radDurchmesserRechts * PI;
 
     // Encoder sind global, in der cpp definiert definiert
@@ -37,7 +37,8 @@ public:
     int getX_position();
     int getY_position();
     float getAngle();
-
+    void setXposition (int x_odometrie);
+    void setYposition (int y_odometrie);
 
     // Test Methoden
     void testOdometrie();
