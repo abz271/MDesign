@@ -35,6 +35,8 @@ public:
 	void UpdateData();
 	void applyOutputToProcess();
 
+	Navigation& StateMachine::getNavigation();
+
 };
 
 #endif	/* STATEMACHINE_H */

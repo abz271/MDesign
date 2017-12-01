@@ -20,8 +20,8 @@ private:
     // Attribute für die Positionsbestimmung
     int X_Koordinaten[5] = {0, 1000, 0, 0, 25};
     int Y_Koordinaten[5] = {1000, 1000, 0, 0, 9};
-    int x_aktuell = 1501; 		// Startwert in x-Richtung
-    int y_aktuell = 100; 		// Startwert in y-Richtung
+    int x_aktuell;
+    int y_aktuell;
     int maxPosition = 2;	// Maximal 5 Positionen
     int Position;				// Aktueller Anfahrpunkt
     // Reglungswerkzeuge
@@ -59,6 +59,8 @@ public: // Getter
 
 public:	// Setter
     void setTargetAngle(float angle);
+    void setXaktuell(int x_aktuell);
+    void setYaktuell(int y_aktuell);
     void setSpeed(int speed);
     void setNextPosition();
 

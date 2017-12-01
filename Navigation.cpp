@@ -138,6 +138,14 @@ void Navigation::setNextPosition(){
 	Position ++;
 }
 
+void Navigation::setXaktuell(int x_aktuell){
+	this->x_aktuell = x_aktuell;
+}
+
+void Navigation::setYaktuell(int y_aktuell){
+	this->y_aktuell = y_aktuell;
+}
+
 // Gibt Vorzeichen des übergebenen Wertes zurück
 int Navigation::signum(float sign){
 	int NumberSign = 0;

@@ -7,6 +7,8 @@ void setup() {
 
 	Serial.begin(9600);
 	Serial.println("Hallo, Robuino");
+	StateM.getNavigation().setXaktuell(1501);
+	StateM.getNavigation().setYaktuell(100);
 }
 
 

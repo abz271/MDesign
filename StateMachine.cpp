@@ -28,6 +28,11 @@ static unsigned long timeLast = millis();
 static unsigned long timeStop = millis();
 static unsigned long timeToPlay = millis();
 
+Navigation& StateMachine::getNavigation(){
+	return Navi;
+}
+
+
 StateMachine::StateMachine() {
 	pinMode(switchPin, INPUT);
 }
