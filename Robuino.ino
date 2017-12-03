@@ -7,13 +7,11 @@ void setup() {
 
 	Serial.begin(9600);
 	Serial.println("Hallo, Robuino");
-	StateM.getNavigation().setXaktuell(1501);
-	StateM.getNavigation().setYaktuell(100);
+	StateM.getNavigation().setStartParameters(201, 201, 0);
 }
 
 
 void loop() {
-
 	StateM.UpdateData();
 	StateM.evalStateMachine();
 }

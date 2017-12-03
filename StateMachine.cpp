@@ -4,9 +4,9 @@
 #include <Arduino.h>
 
 // Allgemeine Todos
-// TODO: Überhaupt nötig? Beacons nicht detektieren.
 // TODO: Testen: Testen der Odometrie ohne Mopped
-// TODO: Testen: Ausweichverhalten
+// TODO: Testen: Testen der Odometrie mit Mopped
+// TODO: Testen: Ausweichverhalten ; nach Umbau noch nicht getestet, neu: Lava
 // TODO: Testen: Wenn Zeit: Drehung auf Stelle optimieren
 // TODO: Testen: Kommunikation
 
@@ -171,7 +171,7 @@ void StateMachine::evalStateMachine() {
 				currentState = stopMotor;
 			} else if (Navi.getDeviation() < Navi.getSafetyRadius()) {
 				// Zielkreis erreicht?
-				Navi.setSpeed(speedmax);
+				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
 				currentState = stopMotor;
 			}
@@ -179,12 +179,14 @@ void StateMachine::evalStateMachine() {
 			break;
 
 		case stopMotor: {
-			if (Navi.getJSON().getStopEnemy()) {
+			// Weiterschalten in AvoidCrash
+			if (Navi.getJSON().getStopEnemy() && !Navi.PositionInLava()) {
 				currentState = avoidCrash;
+			// Letzte Position erreicht?
 			} else if (Navi.getPosition() == Navi.getMaximalPosition()) {
-				// Letzte Position erreicht?
 				Navi.setSpeed(speedmaxturn);
 				currentState = finished;
+			// Wenn an Position gebremst worden ist, nächste Position anfahren
 			} else if (Navi.getSpeed() == 0) {
 				timeLast = timeCur;
 				Navi.setNextPosition();
@@ -194,54 +196,41 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 		case avoidCrash: {
+			// Spielfeldgeraden anlegen
+
+			/*************G2*************
+			 * 							*
+			 * 							*
+			 * 							*
+			 G3 						G4
+			 * 							*
+			 * 							*
+			 * 							*
+			 *************G1*************/
 			Gerade G1(Vec(0, 0), Vec(1, 0));		// G1 und G2 parallel x-Achse
 			Gerade G2(Vec(0, 2000), Vec(1, 0));
 			Gerade G3(Vec(0, 0), Vec(0, 1));		// G3 und G4 parallel y-Achse
 			Gerade G4(Vec(3000, 0), Vec(0, 1));
-			//Vec o(Navi.getX(), Navi.getY());
-			Vec o(1501, 100);
-			Vec r(90);
-			Serial.println(Navi.getOdometrie().getAngle());
-			//Vec r(Navi.getOdometrie().getAngle());
-			Gerade Intersection(o, r);
-			//gedrehter Richtungsvektor: Schnittpunkt mit Spielfeldvektoren prüfen
 
+			// Vektor des Autos anlegen mit gedrehten Richtungsvektor um 90°
+			Vec o(Navi.getX(), Navi.getY());
+			Vec r(Navi.getOdometrie().getAngle());
+			// Gerade des Autos erzeugen
+			Gerade Intersection(o, r);
+
+			//gedrehter Richtungsvektor: Prüfen ob, Schnittpunkt mit Spielfeldvektoren existieren
 			a = Intersection.getIntersection(G1);
 			b = Intersection.getIntersection(G2);
 			c = Intersection.getIntersection(G3);
 			d = Intersection.getIntersection(G4);
 
-			Serial.print("a  :");
-			Serial.println(a);
-			Serial.print("b  :");
-			Serial.println(b);
-			Serial.print("c :");
-			Serial.println(c);
-			Serial.print("d :");
-			Serial.println(d);
-
+			// Schnittpunkte in Vektoren einspeichern
 			Vec IntersectionG1 = Intersection.getDirectVec(a);
 			Vec IntersectionG2 = Intersection.getDirectVec(b);
 			Vec IntersectionG3 = Intersection.getDirectVec(c);
 			Vec IntersectionG4 = Intersection.getDirectVec(d);
 
-			Serial.print("Schnittpunkt G1x :");
-			Serial.println(IntersectionG1.getX());
-			Serial.print("Schnittpunkt G1y  :");
-			Serial.println(IntersectionG1.getY());
-			Serial.print("Schnittpunkt G2x :");
-			Serial.println(IntersectionG2.getX());
-			Serial.print("Schnittpunkt G2y  :");
-			Serial.println(IntersectionG2.getY());
-			Serial.print("Schnittpunkt G3x :");
-			Serial.println(IntersectionG3.getX());
-			Serial.print("Schnittpunkt G3y  :");
-			Serial.println(IntersectionG3.getY());
-			Serial.print("Schnittpunkt G4x :");
-			Serial.println(IntersectionG4.getX());
-			Serial.print("Schnittpunkt G4y  :");
-			Serial.println(IntersectionG4.getY());
-
+			//Länge zu Schnittpunkten berechnen
 			float aimLength = 0;
 			float lengthG1 = Navi.getLengthToPosition(IntersectionG1.getX(),
 					IntersectionG1.getY());
@@ -249,9 +238,10 @@ void StateMachine::evalStateMachine() {
 					IntersectionG2.getY());
 			float lengthG3 = Navi.getLengthToPosition(IntersectionG3.getX(),
 					IntersectionG3.getY());
-			float lengthG4 = Navi.getLengthToPosition(3000,
-					100);
+			float lengthG4 = Navi.getLengthToPosition(IntersectionG4.getX(),
+					IntersectionG4.getY());
 
+			// Überprüfen, welcher Schnittpunkt Sinn ergibt und welcher am weitesten entfernt ist
 			if ((IntersectionG1.getY() >= 0) && (IntersectionG2.getY() <= 2000)) {
 				if ((IntersectionG1.getX() >= 0)
 						&& (IntersectionG1.getX() <= 3000)) {
@@ -292,6 +282,36 @@ void StateMachine::evalStateMachine() {
 					}
 				}
 			}
+			// Ausweichwinkel abspeichern
+			Navi.setTargetAngle(actualAvoidAngle);
+			/*
+
+			Serial.print("a  :");
+			Serial.println(a);
+			Serial.print("b  :");
+			Serial.println(b);
+			Serial.print("c :");
+			Serial.println(c);
+			Serial.print("d :");
+			Serial.println(d);
+
+			Serial.print("Schnittpunkt G1x :");
+			Serial.println(IntersectionG1.getX());
+			Serial.print("Schnittpunkt G1y  :");
+			Serial.println(IntersectionG1.getY());
+			Serial.print("Schnittpunkt G2x :");
+			Serial.println(IntersectionG2.getX());
+			Serial.print("Schnittpunkt G2y  :");
+			Serial.println(IntersectionG2.getY());
+			Serial.print("Schnittpunkt G3x :");
+			Serial.println(IntersectionG3.getX());
+			Serial.print("Schnittpunkt G3y  :");
+			Serial.println(IntersectionG3.getY());
+			Serial.print("Schnittpunkt G4x :");
+			Serial.println(IntersectionG4.getX());
+			Serial.print("Schnittpunkt G4y  :");
+			Serial.println(IntersectionG4.getY());
+
 			Serial.print("aimLength  :");
 			Serial.println(aimLength);
 			Serial.print("lengthG1  :");
@@ -302,24 +322,31 @@ void StateMachine::evalStateMachine() {
 			Serial.println(lengthG3);
 			Serial.print("lengthG4  :");
 			Serial.println(lengthG4);
-
-			Navi.setTargetAngle(actualAvoidAngle);
 			Serial.print("actualAvoidAngle  :");
 			Serial.println(actualAvoidAngle);
 			delay(3000);
+			*/
 
-			if (((timeCur - timeLast) >= intervalStop)) {
+			// Ausweichsignal war nur kurz da?
+			if (!Navi.getJSON().getStopEnemy()){
+				timeLast = timeCur;
+				Navi.setSpeed(speedStartUp);
+				currentState = startUp;
+
+			// Warte kurz und handel entsprechend deiner Bestimmung:
+			}else if (((timeCur - timeLast) >= intervalStop)) {
+				// Masterfahrzeug: Nach Zeitablauf zu neuem Winkel drehen
 				if (Master && Navi.getJSON().getStopEnemy()) {
 					timeLast = timeCur;
 					Navi.setSpeed(speedmaxturn);
 					currentState = turnToAvoidTargetAngle;
+				// Betafahrzeug: Wenn Zeit abgelaufen ist und das andere Fahrzeug verschwunden ist weiterfahren
 				} else {
 					if (!Navi.getJSON().getStopEnemy()) {
 						timeLast = timeCur;
 						Navi.setSpeed(speedStartUp);
 						currentState = startUp;
 					}
-
 				}
 			}
 

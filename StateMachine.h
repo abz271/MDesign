@@ -35,7 +35,7 @@ public:
 	void UpdateData();
 	void applyOutputToProcess();
 
-	Navigation& StateMachine::getNavigation();
+	Navigation& getNavigation();
 
 };
 

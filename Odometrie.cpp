@@ -26,6 +26,10 @@ void Odometrie::setXposition(int x_odometrie){
 void Odometrie::setYposition(int y_odometrie){
 	this->y_odometrie = y_odometrie;
 }
+
+void Odometrie::setAngle(float alpha_odometrie){
+	this->alpha_odometrie = alpha_odometrie;
+}
 /*
  * Funktion setPosition() aktualisiert die Positionsdaten aus der Odometrie
  * mit den Daten aus dem Positionsbestimmungsteam

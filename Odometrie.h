@@ -37,6 +37,7 @@ public:
     int getX_position();
     int getY_position();
     float getAngle();
+    void setAngle(float alpha_odometrie);
     void setXposition (int x_odometrie);
     void setYposition (int y_odometrie);
 

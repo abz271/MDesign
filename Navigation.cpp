@@ -6,9 +6,8 @@
 
 Navigation::Navigation(){
 	Position = 0;
-	Odo.setXposition(x_aktuell);
-	Odo.setYposition(y_aktuell);
 }
+
 
 Odometrie& Navigation::getOdometrie(){
 	return Odo;
@@ -34,7 +33,7 @@ void Navigation::UpdateData() {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
 	}
-	Odo.testOdometrie();
+	//Odo.testOdometrie();
 }
 
 float Navigation::getCalculateAngle(int x, int y) {
@@ -46,6 +45,31 @@ float Navigation::getCalculateAngle(int x, int y) {
 	return Winkel;
 }
 
+bool Navigation::PositionInLava(){
+	bool Lava = false;
+	if (((x_aktuell >= 0) && (x_aktuell <= 200)) ){
+		if ((y_aktuell >= 0) && (y_aktuell <= 2000)){
+			Lava = true;
+		}
+	}
+	if (((x_aktuell >= 2800) && (x_aktuell <= 3000))){
+		if ((y_aktuell >= 0) && (y_aktuell <= 2000)){
+			Lava = true;
+		}
+	}
+	if((x_aktuell >= 200) && (x_aktuell <= 2800)){
+		if ((y_aktuell >= 1800) && (y_aktuell <= 2000)){
+			Lava = true;
+		}
+	}
+	if ((x_aktuell >= 200) && (x_aktuell <= 2800)){
+		if ((y_aktuell >= 0) && (y_aktuell <= 200)){
+			Lava = true;
+		}
+	}
+
+	return Lava;
+}
 // Berechnet die VektorlÃ¤nge zwischen dem aktuellem Standort und dem Zielpunkt.
 // Wird evtl nicht mehr gebraucht
 float Navigation::getLengthToPosition(int x, int y) {
@@ -138,12 +162,10 @@ void Navigation::setNextPosition(){
 	Position ++;
 }
 
-void Navigation::setXaktuell(int x_aktuell){
-	this->x_aktuell = x_aktuell;
-}
-
-void Navigation::setYaktuell(int y_aktuell){
-	this->y_aktuell = y_aktuell;
+void Navigation::setStartParameters(int x, int y, float angle){
+	Odo.setXposition(x);
+	Odo.setYposition(y);
+	Odo.setAngle(angle);
 }
 
 // Gibt Vorzeichen des übergebenen Wertes zurück

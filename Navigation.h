@@ -20,8 +20,8 @@ private:
     // Attribute für die Positionsbestimmung
     int X_Koordinaten[5] = {0, 1000, 0, 0, 25};
     int Y_Koordinaten[5] = {1000, 1000, 0, 0, 9};
-    int x_aktuell;
-    int y_aktuell;
+    int x_aktuell = 0;
+    int y_aktuell = 0;
     int maxPosition = 2;	// Maximal 5 Positionen
     int Position;				// Aktueller Anfahrpunkt
     // Reglungswerkzeuge
@@ -34,6 +34,7 @@ private:
 
 public:	// Allgemeines
     Navigation();
+    bool PositionInLava();
     void UpdateData();
     void turnToTargetAngle();
     void driveToTargetPosition();
@@ -58,9 +59,8 @@ public: // Getter
     int getX();
 
 public:	// Setter
+    void setStartParameters(int x, int y, float angle);
     void setTargetAngle(float angle);
-    void setXaktuell(int x_aktuell);
-    void setYaktuell(int y_aktuell);
     void setSpeed(int speed);
     void setNextPosition();
 
