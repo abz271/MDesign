@@ -75,7 +75,7 @@ void Kommunikation::DataFromPosition(String& comString) {
 	Wire.requestFrom(positionAddress, stringLength);
 
 	// Char array anlegen
-	char c = 0;
+	char c;
 
 	// Daten einlesen
 	while (Wire.available()) {
@@ -84,6 +84,8 @@ void Kommunikation::DataFromPosition(String& comString) {
 		c = Wire.read();
 		comString += c;
 	}
+
+	Serial.println(comString);
 
 }
 
@@ -107,8 +109,8 @@ bool Kommunikation::getPosition(int& xPos, int& yPos) {
 	// TODO: Nach Übersetzungsfehler prüfen
 
 	// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
-	xPos = root["xPos"];
-	yPos = root["yPos"];
+	xPos = root["x"];
+	yPos = root["y"];
 	return root["sigOk"];
 
 }
@@ -171,10 +173,13 @@ bool Kommunikation::getSignalUsefull() {
 void Kommunikation::testKommunikation(){
 	static unsigned long time = millis();
 
-	bool signalOk = true;
+	bool signalOk = false;
 	bool enemyDet = false;
 	int x, y = -1000;
 
+	signalOk = getPosition(x, y);
+
+	/*
 	if(millis() > time + 100){
 		time = millis();
 
@@ -194,6 +199,7 @@ void Kommunikation::testKommunikation(){
 
 
 	}
+	*/
 
 }
 

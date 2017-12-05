@@ -1,17 +1,21 @@
 #include "Arduino.h"
 #include "StateMachine.h"
-#include "Gerade.h"
+//#include "Gerade.h
+#include "Kommunikation.h"
+
+Kommunikation komi;
 
 StateMachine StateM;
 void setup() {
 
 	Serial.begin(9600);
 	Serial.println("Hallo, Robuino");
-	StateM.getNavigation().setStartParameters(201, 201, 0);
 }
 
 
 void loop() {
-	StateM.UpdateData();
-	StateM.evalStateMachine();
+
+	komi.testKommunikation();
+	//StateM.UpdateData();
+	//StateM.evalStateMachine();
 }
