@@ -24,7 +24,7 @@ Kommunikation& Navigation::getJSON(){
 void Navigation::UpdateData() {
 	Odo.updateOdometrie();
 	Moto.updateVelocity();
-	int xFromPosition, yFromPosition;
+	float xFromPosition, yFromPosition;
 	if (JSON.getPosition(xFromPosition, yFromPosition) ) {
 		x_aktuell = xFromPosition;
 		y_aktuell = yFromPosition;

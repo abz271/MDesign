@@ -94,7 +94,7 @@ void Kommunikation::DataFromPosition(String& comString) {
  * Außerdem wird ein bool zurück gegeben ob die Information verwendbar ist oder nicht
  * Diese Methode kümmert sich um das Übersetzen des JSONs
  */
-bool Kommunikation::getPosition(int& xPos, int& yPos) {
+bool Kommunikation::getPosition(float& xPos, float& yPos) {
 
 	// Buffer fÃ¼r den Json String
 	StaticJsonBuffer<100> jsonBuffer;
@@ -111,7 +111,7 @@ bool Kommunikation::getPosition(int& xPos, int& yPos) {
 	// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
 	xPos = root["x"];
 	yPos = root["y"];
-	return root["sigOk"];
+	return !root["e"];
 
 }
 
@@ -175,7 +175,7 @@ void Kommunikation::testKommunikation(){
 
 	bool signalOk = false;
 	bool enemyDet = false;
-	int x, y = -1000;
+	float x, y = -1000;
 
 	signalOk = getPosition(x, y);
 

@@ -20,7 +20,7 @@ public:
 	Kommunikation();
 	//bool getSignalUsefull();
 	bool getStopEnemy();
-	bool getPosition(int& xPos, int& yPos);
+	bool getPosition(float& xPos, float& yPos);
 
 	// Zum testen Objekt im Robi.cpp anlegen und dann
 	// diese Funktion einfach im loop laufen lassen
