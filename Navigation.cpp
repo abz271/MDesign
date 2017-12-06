@@ -25,9 +25,15 @@ void Navigation::UpdateData() {
 	Odo.updateOdometrie();
 	Moto.updateVelocity();
 	float xFromPosition, yFromPosition;
+<<<<<<< HEAD
 	if (/*JSON.getPosition(xFromPosition, yFromPosition)*/ 0 ) {
 		x_aktuell = int(xFromPosition);
 		y_aktuell = int(yFromPosition);
+=======
+	if (JSON.getPosition(xFromPosition, yFromPosition) ) {
+		x_aktuell = xFromPosition;
+		y_aktuell = yFromPosition;
+>>>>>>> branch 'master' of https://github.com/TorbenMa/mdesign
 		Odo.setPosition(x_aktuell, y_aktuell);
 	} else {
 		x_aktuell = Odo.getX_position();

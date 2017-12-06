@@ -18,6 +18,7 @@ private:
     float speed = 100;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
     float targetAngle = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
     // Attribute für die Positionsbestimmung
+<<<<<<< HEAD
     int X_Koordinaten[5] = {300, 850, 2150, 2790, 300};			// Alpha Fahrzeug Koordinaten
     int Y_Koordinaten[5] = {1700, 1460, 1460, 200, 1700};		// Alpha Fahrzeug Koordinaten
 
@@ -26,6 +27,13 @@ private:
     int x_aktuell = 0;
     int y_aktuell = 0;
     int maxPosition = 4;		// Maximal 5 Positionen; Zählweise ab 0
+=======
+    int X_Koordinaten[5] = {0, 1000, 0, 0, 25};
+    int Y_Koordinaten[5] = {1000, 1000, 0, 0, 9};
+    float x_aktuell = 0;
+    float y_aktuell = 0;
+    int maxPosition = 2;	// Maximal 5 Positionen
+>>>>>>> branch 'master' of https://github.com/TorbenMa/mdesign
     int Position;				// Aktueller Anfahrpunkt
     // Reglungswerkzeuge
 	float controlDeviation = 0;		// Sollwert Geradeausfahrt (Drehwinkel)
