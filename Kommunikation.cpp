@@ -171,16 +171,10 @@ void Kommunikation::testKommunikation(){
 	bool signalOk = false;
 	bool enemyDet = false;
 	float x, y = -1000;
-<<<<<<< HEAD
 
 	signalOk = getPosition(x, y);
 
-=======
->>>>>>> branch 'master' of https://github.com/TorbenMa/mdesign
 
-	signalOk = getPosition(x, y);
-
-	/*
 	if(millis() > time + 100){
 		time = millis();
 		 signalOk = getPosition(x, y);
@@ -195,11 +189,7 @@ void Kommunikation::testKommunikation(){
 		 Serial.print(enemyDet);
 		 Serial.println();
 	}
-<<<<<<< HEAD
 
-=======
-	*/
->>>>>>> branch 'master' of https://github.com/TorbenMa/mdesign
 
 }
 
