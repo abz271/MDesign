@@ -24,16 +24,16 @@ Kommunikation& Navigation::getJSON(){
 void Navigation::UpdateData() {
 	Odo.updateOdometrie();
 	Moto.updateVelocity();
-	int xFromPosition, yFromPosition;
-	if (JSON.getPosition(xFromPosition, yFromPosition) ) {
-		x_aktuell = xFromPosition;
-		y_aktuell = yFromPosition;
+	float xFromPosition, yFromPosition;
+	if (/*JSON.getPosition(xFromPosition, yFromPosition)*/ 0 ) {
+		x_aktuell = int(xFromPosition);
+		y_aktuell = int(yFromPosition);
 		Odo.setPosition(x_aktuell, y_aktuell);
 	} else {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
 	}
-	//Odo.testOdometrie();
+	Odo.testOdometrie();
 }
 
 float Navigation::getCalculateAngle(int x, int y) {
@@ -47,23 +47,24 @@ float Navigation::getCalculateAngle(int x, int y) {
 
 bool Navigation::PositionInLava(){
 	bool Lava = false;
-	if (((x_aktuell >= 0) && (x_aktuell <= 200)) ){
+	int Lavabereich = 300;
+	if (((x_aktuell >= 0) && (x_aktuell <= Lavabereich)) ){
 		if ((y_aktuell >= 0) && (y_aktuell <= 2000)){
 			Lava = true;
 		}
 	}
-	if (((x_aktuell >= 2800) && (x_aktuell <= 3000))){
+	if (((x_aktuell >= 3000-Lavabereich) && (x_aktuell <= 3000))){
 		if ((y_aktuell >= 0) && (y_aktuell <= 2000)){
 			Lava = true;
 		}
 	}
-	if((x_aktuell >= 200) && (x_aktuell <= 2800)){
-		if ((y_aktuell >= 1800) && (y_aktuell <= 2000)){
+	if((x_aktuell >= Lavabereich) && (x_aktuell <= 3000-Lavabereich)){
+		if ((y_aktuell >= 2000-Lavabereich) && (y_aktuell <= 2000)){
 			Lava = true;
 		}
 	}
-	if ((x_aktuell >= 200) && (x_aktuell <= 2800)){
-		if ((y_aktuell >= 0) && (y_aktuell <= 200)){
+	if ((x_aktuell >= Lavabereich) && (x_aktuell <= 3000-Lavabereich)){
+		if ((y_aktuell >= 0) && (y_aktuell <= Lavabereich)){
 			Lava = true;
 		}
 	}
@@ -91,15 +92,17 @@ void Navigation::turnToTargetAngle() {
 	Serial.println(e);
 	if (abs(e) < 50){
 		//speed --;		//Originalversion
-		speed = speed - 2;
+		speed = speed - 5;
 		if (speed <= 0){
 			Moto.stop();
 		}
 	}
 }
+
 void Navigation::driveToTargetPosition(){
 	e = getLengthToPosition(X_Koordinaten[Position], Y_Koordinaten[Position]);
 	// implementierung P-Regler
+	Serial.println(e);
 	controlDeviation = getTargetAngle();	// Soll Winkel
 	actualDeviation = Odo.getAngle();		// Ist Winkel
 	//Reglerdifferenz verstärken und übertragen
@@ -151,6 +154,7 @@ void Navigation::setSpeed(int speed){
 	this->speed = speed;
 }
 
+
 void Navigation::setTargetAngle(float angle) {
 	if (angle >= 360.0){
 		angle -= 360.0;
@@ -162,6 +166,9 @@ void Navigation::setNextPosition(){
 	Position ++;
 }
 
+void Navigation::setPosition(int Position){
+	this->Position = Position;
+}
 void Navigation::setStartParameters(int x, int y, float angle){
 	Odo.setXposition(x);
 	Odo.setYposition(y);
@@ -179,5 +186,4 @@ int Navigation::signum(float sign){
 	}
 	return NumberSign;
 }
-
 

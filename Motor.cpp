@@ -73,8 +73,8 @@ void Motor::turn(float velocity) {
 
 	nextVelocityPwmLeft = abs(velocity);
 	nextVelocityPwmRight = abs(velocity);
-
 }
+
 
 
 

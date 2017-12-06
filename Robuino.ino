@@ -3,11 +3,12 @@
 #include "Gerade.h"
 
 StateMachine StateM;
+
 void setup() {
 
 	Serial.begin(9600);
 	Serial.println("Hallo, Robuino");
-	StateM.getNavigation().setStartParameters(201, 201, 0);
+	StateM.getNavigation().setStartParameters(250, 250, 90);
 }
 
 

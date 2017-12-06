@@ -26,7 +26,7 @@ private:
 	const unsigned long interval = 1000;
 	const unsigned long intervalStop = 5000;
 	const unsigned long intervalDrive = 1000;
-	const unsigned long intervalPlaytime = 25000;
+	const unsigned long intervalPlaytime = 1190000;
 
 public:
 

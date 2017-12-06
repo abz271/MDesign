@@ -1,3 +1,4 @@
+
 #include "Kommunikation.h"
 
 #include <Wire.h>
@@ -75,7 +76,7 @@ void Kommunikation::DataFromPosition(String& comString) {
 	Wire.requestFrom(positionAddress, stringLength);
 
 	// Char array anlegen
-	char c = 0;
+	char c;
 
 	// Daten einlesen
 	while (Wire.available()) {
@@ -85,6 +86,8 @@ void Kommunikation::DataFromPosition(String& comString) {
 		comString += c;
 	}
 
+	Serial.println(comString);
+
 }
 
 /*
@@ -92,7 +95,7 @@ void Kommunikation::DataFromPosition(String& comString) {
  * Auﬂerdem wird ein bool zur¸ck gegeben ob die Information verwendbar ist oder nicht
  * Diese Methode k¸mmert sich um das ‹bersetzen des JSONs
  */
-bool Kommunikation::getPosition(int& xPos, int& yPos) {
+bool Kommunikation::getPosition(float& xPos, float& yPos) {
 
 	// Buffer f√ºr den Json String
 	StaticJsonBuffer<100> jsonBuffer;
@@ -107,9 +110,9 @@ bool Kommunikation::getPosition(int& xPos, int& yPos) {
 	// TODO: Nach √úbersetzungsfehler pr√ºfen
 
 	// Werte aus dem Json Objekt auslesen und den √ºbergebenen Werten zuweisen
-	xPos = root["xPos"];
-	yPos = root["yPos"];
-	return root["sigOk"];
+	xPos = root["x"];
+	yPos = root["y"];
+	return !root["e"];
 
 }
 
@@ -148,40 +151,34 @@ bool Kommunikation::getStopEnemy() {
 bool Kommunikation::getSignalUsefull() {
 	// Buffer f√ºr den Json String
 	StaticJsonBuffer<100> jsonBuffer;
-
 	// Variablen
 	bool result = false;
 	String comString;
-
 	// Daten von dem Positions-Team abfragen
 	DataFromPosition(comString);
-
 	// Einen Json String erstellen
 	JsonObject& root = jsonBuffer.parseObject(comString);
-
 	//Daten in den Json String schreiben
 	result = root["sigOk"];
-
 	// Return des Ergebnisses
 	return result;
-
 }
-*/
+
 
 void Kommunikation::testKommunikation(){
 	static unsigned long time = millis();
 
-	bool signalOk = true;
+	bool signalOk = false;
 	bool enemyDet = false;
-	int x, y = -1000;
+	float x, y = -1000;
+
+	signalOk = getPosition(x, y);
+
 
 	if(millis() > time + 100){
 		time = millis();
-
-
 		 signalOk = getPosition(x, y);
 		 enemyDet = getStopEnemy();
-
 		 Serial.print("SigOk:  ");
 		 Serial.print(signalOk);
 		 Serial.print("   xPos:  ");
@@ -191,16 +188,15 @@ void Kommunikation::testKommunikation(){
 		 Serial.print("   Genger vorraus:   ");
 		 Serial.print(enemyDet);
 		 Serial.println();
-
-
 	}
+
 
 }
 
-/*
- * Master testen
- * Der Master empf√§ngt etwas
- */
+
+// Master testen
+// Der Master empf√§ngt etwas
+
 void Kommunikation::testAsMaster() {
 
 	static unsigned long mili = millis();
@@ -254,13 +250,13 @@ void send() {
 	Wire.write("hello i^2c");
 }
 
-/*
- * Slave testen
- * Der Slave sendet etwas
- */
+
+  //Slave testen
+  //Der Slave sendet etwas
 void Kommunikation::testAsSlave() {
 
 	Wire.begin(3);
 	Wire.onRequest(send);
 
 }
+*/

@@ -183,6 +183,9 @@ void Odometrie::testBerechnung(float diffLeft[], float diffRight[],
 		alpha_odometrie += (-1.0 * (diffLeft[i] + diffRight[i]) * 180)
 				/ (Achsabstand * PI);
 
+		if (alpha_odometrie <= 360){
+			alpha_odometrie = 0;
+		}
 		// Alles ausgeben und mal schauen wie es so aussieht
 		Serial.print("x_Pos: ");
 		Serial.print(x_odometrie);

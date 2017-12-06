@@ -17,10 +17,10 @@ private:
 
 
     // Rad Geometrie
-    const float radDurchmesserLinks = 49.35;
+    const float radDurchmesserLinks = 49.1;
     const float radUmfangLinks = radDurchmesserLinks * PI;
 
-    const float radDurchmesserRechts = 49.25;
+    const float radDurchmesserRechts = 49.3;
     const float radUmfangRechts = radDurchmesserRechts * PI;
 
     // Encoder sind global, in der cpp definiert definiert
