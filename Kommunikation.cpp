@@ -12,19 +12,19 @@
 Kommunikation::Kommunikation() {
 
 	// Verbindung als Master aufbauen
-	// TODO: für Testzwecke auch als Slave, Adresse einfügen
+	// TODO: fÃ¼r Testzwecke auch als Slave, Adresse einfÃ¼gen
 	Wire.begin();
 
 }
 
 /*
- * Fragt die Daten über den i^2c Bus von der Hardware Gruppe an
- * und gibt sie per Reference zurück
+ * Fragt die Daten Ã¼ber den i^2c Bus von der Hardware Gruppe an
+ * und gibt sie per Reference zurÃ¼ck
  * i^2c Bus Methode
  */
 void Kommunikation::DataFromHardware(String& comString) {
 
-	// TODO: String größe ermitteln aus funktion
+	// TODO: String grÃ¶ÃŸe ermitteln aus funktion
 	// Kommunikation starten, Daten anfragen
 
 	Wire.requestFrom(hardwareAddress, stringLength);
@@ -42,11 +42,11 @@ void Kommunikation::DataFromHardware(String& comString) {
 }
 
 /*
- * Sendet sie Daten für dei Moteren an die Hardware Gruppe
+ * Sendet sie Daten fÃ¼r dei Moteren an die Hardware Gruppe
  * i^2c Bus Methode
  */
 
-// TODO: Methode wird nicht mehr genutzt. Kann gelöscht werden?
+// TODO: Methode wird nicht mehr genutzt. Kann gelÃ¶scht werden?
 void Kommunikation::DataToHardware(String comString) {
 
 	// Char Array anlegen
@@ -56,7 +56,7 @@ void Kommunikation::DataToHardware(String comString) {
 	// Kommunikation beginnen
 	Wire.beginTransmission(hardwareAddress);
 
-	// Daten übertragen, als normales Char Array übertragen
+	// Daten Ã¼bertragen, als normales Char Array Ã¼bertragen
 	Wire.write(charComString);
 
 	// Kommunikation beenden
@@ -65,12 +65,12 @@ void Kommunikation::DataToHardware(String comString) {
 }
 
 /*
- * Fragt die Daten �ber den i2c Bus von der Positions Gruppe an
+ * Fragt die Daten über den i2c Bus von der Positions Gruppe an
  * i2c Methode
  */
 void Kommunikation::DataFromPosition(String& comString) {
 
-	// TODO: String gr��e ermitteln aus funktion
+	// TODO: String größe ermitteln aus funktion
 	// Kommunikation starten, Daten anfragen
 
 	Wire.requestFrom(positionAddress, stringLength);
@@ -91,38 +91,38 @@ void Kommunikation::DataFromPosition(String& comString) {
 }
 
 /*
- * Gibt die aktuelle Position der Positionsgruppe per Referenze zur�ck
- * Au�erdem wird ein bool zur�ck gegeben ob die Information verwendbar ist oder nicht
- * Diese Methode k�mmert sich um das �bersetzen des JSONs
+ * Gibt die aktuelle Position der Positionsgruppe per Referenze zurück
+ * Außerdem wird ein bool zurück gegeben ob die Information verwendbar ist oder nicht
+ * Diese Methode kümmert sich um das Übersetzen des JSONs
  */
 bool Kommunikation::getPosition(float& xPos, float& yPos) {
 
-	// Buffer für den Json String
+	// Buffer fÃ¼r den Json String
 	StaticJsonBuffer<100> jsonBuffer;
 	String comString;
 
 	// Daten von dem Positionsteam abfragen
 	DataFromPosition(comString);
 
-	// Json Object aus dem übergebenen string erstellen
+	// Json Object aus dem Ã¼bergebenen string erstellen
 	JsonObject& root = jsonBuffer.parseObject(comString);
 
-	// TODO: Nach Übersetzungsfehler prüfen
+	// TODO: Nach Ãœbersetzungsfehler prÃ¼fen
 
-	// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
+	// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
 	xPos = root["x"];
 	yPos = root["y"];
-	return !root["e"];
+	return root["e"];
 
 }
 
 /*
- * Gibt einen bool zurück wenn sich ein Gegner in Reichweise der Sensoren befindet
- * Diese Methode kümmert sich um das Übersetzen des JSONs
+ * Gibt einen bool zurÃ¼ck wenn sich ein Gegner in Reichweise der Sensoren befindet
+ * Diese Methode kÃ¼mmert sich um das Ãœbersetzen des JSONs
  */
 bool Kommunikation::getStopEnemy() {
 
-	// Buffer für den Json String
+	// Buffer fÃ¼r den Json String
 	StaticJsonBuffer<100> jsonBuffer;
 
 	// Variablen
@@ -144,12 +144,12 @@ bool Kommunikation::getStopEnemy() {
 }
 
 /*
- *	Gibt einen Bool zurück, wenn das Signal des Positionsbestimmungsteams gut ist.
+ *	Gibt einen Bool zurÃ¼ck, wenn das Signal des Positionsbestimmungsteams gut ist.
  *  Wird in den Funktionen genutzt, um Daten zu aktualisieren und zu kalibrieren
  */
  /*
 bool Kommunikation::getSignalUsefull() {
-	// Buffer für den Json String
+	// Buffer fÃ¼r den Json String
 	StaticJsonBuffer<100> jsonBuffer;
 	// Variablen
 	bool result = false;
@@ -195,7 +195,7 @@ void Kommunikation::testKommunikation(){
 
 
 // Master testen
-// Der Master empfängt etwas
+// Der Master empfÃ¤ngt etwas
 
 void Kommunikation::testAsMaster() {
 
@@ -225,12 +225,12 @@ void Kommunikation::testAsMaster() {
 			comString += c;
 		}
 
-		// Buffer für den Json String
+		// Buffer fÃ¼r den Json String
 		StaticJsonBuffer<100> jsonBuffer;
 
-		// Json Object aus dem übergebenen string erstellen
+		// Json Object aus dem Ã¼bergebenen string erstellen
 		JsonObject& root = jsonBuffer.parseObject(comString);
-		// Werte aus dem Json Objekt auslesen und den übergebenen Werten zuweisen
+		// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
 
 		float left = root["left"];
 		float right = root["right"];
