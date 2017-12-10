@@ -30,9 +30,26 @@ void Navigation::UpdateData() {
 		x_aktuell = int(xFromPosition);
 		y_aktuell = int(yFromPosition);
 		Odo.setPosition(x_aktuell, y_aktuell);
+
+		if ((x_PositionteamOld != 0) && (y_PositionteamOld != 0)){
+			x_PositionteamNew = x_PositionteamOld;
+			y_PositionteamNew = x_PositionteamOld;
+		}
+		x_PositionteamOld = x_aktuell;
+		y_PositionteamOld = y_aktuell;
+		if ((x_PositionteamNew != 0) && (y_PositionteamNew != 0)){
+			int deltaX = x_PositionteamOld - x_PositionteamNew;
+			int deltaY = y_PositionteamOld - y_PositionteamNew;
+			float angle = atan2(deltaY, deltaX) * 180/PI;
+			Odo.setAngle(angle);
+		}
 	} else {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
+		x_PositionteamOld = 0;
+		y_PositionteamOld = 0;
+		x_PositionteamNew = 0;
+		y_PositionteamNew = 0;
 	}
 	Odo.testOdometrie();
 }
@@ -188,3 +205,22 @@ int Navigation::signum(float sign){
 	return NumberSign;
 }
 
+bool Navigation::CalcualtedEnemyInArea(){
+	int xPositionObject = 0;
+	int yPositionObject = 0;
+	bool result = false;
+	int radius = 270; 		// Radius des Fahrzeugs 150 + 100 Messentfernung + 20 Offset
+	xPositionObject = cos(Odo.getAngle()* PI/180)*radius + x_aktuell;
+	yPositionObject = sin(Odo.getAngle()* PI/180)*radius + y_aktuell;
+
+	if (((xPositionObject > 0) && (xPositionObject < 3000)) && ((yPositionObject > 0) && (yPositionObject < 2000))){
+		result = true;
+	}
+	Serial.print("x:  ");
+	Serial.println(xPositionObject);
+	Serial.print("y:  ");
+	Serial.println(yPositionObject);
+	Serial.print("Ergebnis: Objekt im Gebiet:  ");
+	Serial.println(result);
+	return result;
+}

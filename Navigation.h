@@ -27,6 +27,12 @@ private:
     int y_aktuell = 0;
     int maxPosition = 4;		// Maximal 5 Positionen; Zählweise ab 0
     int Position;				// Aktueller Anfahrpunkt
+
+    int x_PositionteamOld = 0;
+    int x_PositionteamNew = 0;
+    int y_PositionteamOld = 0;
+    int y_PositionteamNew = 0;
+
     // Reglungswerkzeuge
 	float controlDeviation = 0;		// Sollwert Geradeausfahrt (Drehwinkel)
 	float actualDeviation = 0;		// Istwert Geradeausfahrt (Drehwinkel)
@@ -42,6 +48,7 @@ public:	// Allgemeines
     void UpdateData();
     void turnToTargetAngle();
     void driveToTargetPosition();
+    bool CalcualtedEnemyInArea();
     Odometrie& getOdometrie();
     Kommunikation& getJSON();
     Motor& getMotor();

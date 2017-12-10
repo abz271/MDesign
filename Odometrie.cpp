@@ -57,7 +57,7 @@ void Odometrie::updateOdometrie() {
 	// Updaten der Attribute
 
 	x_odometrie += d_center * cos((alpha_odometrie * PI) / 180);
-	y_odometrie += d_center * sin((alpha_odometrie * PI) / 180);
+	y_odometrie += d_center* (1000/1012) * sin((alpha_odometrie * PI) / 180);
 
 	//Winkel des Fahrzeugs berechnen und Attribute updaten
 	alpha_odometrie += (-1.0 * (leftWheelChange + rightWheelChange) * 180) / (Achsabstand * PI);
