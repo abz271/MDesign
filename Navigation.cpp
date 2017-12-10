@@ -38,9 +38,9 @@ void Navigation::UpdateData() {
 		x_PositionteamOld = x_aktuell;
 		y_PositionteamOld = y_aktuell;
 		if ((x_PositionteamNew != 0) && (y_PositionteamNew != 0)){
-			int deltaX = x_PositionteamOld - x_PositionteamNew;
-			int deltaY = y_PositionteamOld - y_PositionteamNew;
-			float angle = atan2(deltaY, deltaX) * 180/PI;
+			int deltaX = x_PositionteamNew - x_PositionteamOld;
+			int deltaY = y_PositionteamNew - y_PositionteamOld;
+			float angle = atan2(deltaY, deltaX) * 180/PI;	// evtl ( 0 , 0 ) abfangen
 			Odo.setAngle(angle);
 		}
 	} else {
@@ -62,7 +62,7 @@ float Navigation::getCalculateAngle(int x, int y) {
 
 	return Winkel;
 }
-
+// TODO: Evtl nicht mehr genutzt
 bool Navigation::PositionInLava(){
 	bool Lava = false;
 	int Lavabereich = 300;
@@ -126,6 +126,26 @@ void Navigation::driveToTargetPosition(){
 	//Reglerdifferenz verstärken und übertragen
 	differenceDeviation = (controlDeviation - actualDeviation) * amplifierKp;
 	Moto.driveStraightRegulated(speed, differenceDeviation);
+}
+
+bool Navigation::DetectedEnemyInArea(){
+	int xPositionObject = 0;
+	int yPositionObject = 0;
+	bool result = false;
+	int radius = 270; 		// Radius des Fahrzeugs 150 + 100 Messentfernung + 20 Offset
+	xPositionObject = cos(Odo.getAngle()* PI/180)*radius + x_aktuell;
+	yPositionObject = sin(Odo.getAngle()* PI/180)*radius + y_aktuell;
+
+	if (((xPositionObject > 0) && (xPositionObject < 3000)) && ((yPositionObject > 0) && (yPositionObject < 2000))){
+		result = true;
+	}
+	Serial.print("x:  ");
+	Serial.println(xPositionObject);
+	Serial.print("y:  ");
+	Serial.println(yPositionObject);
+	Serial.print("Ergebnis: Objekt im Gebiet:  ");
+	Serial.println(result);
+	return result;
 }
 
 int Navigation::getTargetCoordinateX(){
@@ -205,22 +225,4 @@ int Navigation::signum(float sign){
 	return NumberSign;
 }
 
-bool Navigation::CalcualtedEnemyInArea(){
-	int xPositionObject = 0;
-	int yPositionObject = 0;
-	bool result = false;
-	int radius = 270; 		// Radius des Fahrzeugs 150 + 100 Messentfernung + 20 Offset
-	xPositionObject = cos(Odo.getAngle()* PI/180)*radius + x_aktuell;
-	yPositionObject = sin(Odo.getAngle()* PI/180)*radius + y_aktuell;
 
-	if (((xPositionObject > 0) && (xPositionObject < 3000)) && ((yPositionObject > 0) && (yPositionObject < 2000))){
-		result = true;
-	}
-	Serial.print("x:  ");
-	Serial.println(xPositionObject);
-	Serial.print("y:  ");
-	Serial.println(yPositionObject);
-	Serial.print("Ergebnis: Objekt im Gebiet:  ");
-	Serial.println(result);
-	return result;
-}

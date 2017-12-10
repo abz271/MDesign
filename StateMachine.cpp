@@ -146,11 +146,11 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 		case startUp: {
-			if (Navi.getJSON().getStopEnemy()) {
+			if (Navi.getJSON().getStopEnemy() && Navi.DetectedEnemyInArea()) {
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
-				currentState = avoidCrash;
-				Serial.println("von startUp nach avoidCrash");
+				currentState = stopMotor;
+				Serial.println("von startUp nach stopMotor");
 			} else if ((timeCur - timeLast) >= interval) {
 				Navi.setSpeed(150);
 				currentState = driveStraightRegulated;
@@ -169,7 +169,7 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 		case driveStraightRegulated: {
-			if (Navi.getJSON().getStopEnemy()&& (!Navi.PositionInLava())) {
+			if (Navi.getJSON().getStopEnemy()&& Navi.DetectedEnemyInArea()) {
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
 				currentState = stopMotor;
@@ -327,8 +327,8 @@ void StateMachine::evalStateMachine() {
 				timeToPlay = playTime;
 				Navi.setPosition(0);
 				currentState = nextPoint;
+				Serial.println("von finished nach nextPoint");
 			}
-
 		}
 			break;
 
@@ -338,6 +338,7 @@ void StateMachine::evalStateMachine() {
 				timeToPlay = playTime;
 				Navi.setPosition(0);
 				currentState = nextPoint;
+				Serial.println("von finishedOutOfTime nach nextPoint");
 			}
 		}
 			break;

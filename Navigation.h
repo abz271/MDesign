@@ -48,7 +48,7 @@ public:	// Allgemeines
     void UpdateData();
     void turnToTargetAngle();
     void driveToTargetPosition();
-    bool CalcualtedEnemyInArea();
+    bool DetectedEnemyInArea();
     Odometrie& getOdometrie();
     Kommunikation& getJSON();
     Motor& getMotor();
