@@ -8,7 +8,7 @@ class Odometrie {
 private:
 
 	// Geometrie des Fahrzeugs
-    float Achsabstand = 273;	// in mm
+    float Achsabstand = 273.0*(360.0/361.0);	// in mm
 
 	// Position
     float x_odometrie;
@@ -17,10 +17,10 @@ private:
 
 
     // Rad Geometrie
-    const float radDurchmesserLinks = 52.7*1012/1000;
+    const float radDurchmesserLinks = 52.7;
     const float radUmfangLinks = radDurchmesserLinks * PI;
 
-    const float radDurchmesserRechts = 52.7*1012/1000;
+    const float radDurchmesserRechts = 52.7;
     const float radUmfangRechts = radDurchmesserRechts * PI;
 
     // Encoder sind global, in der cpp definiert definiert
