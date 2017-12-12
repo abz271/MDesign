@@ -18,15 +18,15 @@ private:
 	// Ausweichverhalten
 	bool Master = true;
 	float actualAvoidAngle = 0;
-	float a = 0; float b = 0; float c = 0; float d = 0;
+	float a = 0; float b =  0; float c = 0; float d = 0;
 
 	// Zeitverhalten
 	unsigned long timeCur = millis();
 	unsigned long playTime = millis();
 	const unsigned long interval = 1000;
-	const unsigned long intervalStop = 5000;
-	const unsigned long intervalDrive = 1000;
-	const unsigned long intervalPlaytime = 1190000;
+	const unsigned long intervalStop = 3000;
+	const unsigned long intervalDrive = 1500;
+	const unsigned long intervalPlaytime = 90000;
 
 public:
 

@@ -22,8 +22,8 @@ private:
     int X_Koordinaten[5] = {300, 850, 2150, 2790, 300};			// Alpha Fahrzeug Koordinaten
     int Y_Koordinaten[5] = {1700, 1460, 1460, 200, 1700};		// Alpha Fahrzeug Koordinaten
 
-    //int X_Koordinaten[5] = {2700, 2800, 2700, 1500, 710};		// Beta Fahrzeug Koordinaten
-    //int Y_Koordinaten[5] = {1700, 1300, 200, 800, 200};		// Beta Fahrzeug Koordinaten
+    //int X_Koordinaten[6] = {2700, 2800, 2700, 1500, 710, 2700};		// Beta Fahrzeug Koordinaten
+    //int Y_Koordinaten[6] = {1700, 1300, 200, 800, 300, 300};		// Beta Fahrzeug Koordinaten
     int x_aktuell = 0;
     int y_aktuell = 0;
     int maxPosition = 4;		// Maximal 5 Positionen; Zählweise ab 0
@@ -33,6 +33,8 @@ private:
     int x_PositionteamNew = 0;
     int y_PositionteamOld = 0;
     int y_PositionteamNew = 0;
+
+    bool takePosition = false;
 
     // Reglungswerkzeuge
 	float controlDeviation = 0;		// Sollwert Geradeausfahrt (Drehwinkel)
@@ -73,11 +75,12 @@ public: // Getter
 
 public:	// Setter
     void setStartParameters(int x, int y, float angle);
-    void setStateInStartUp(bool StateStartup);
+    void setPrePositionteams(bool StateStartup);
     void setDirection(float odo, float ziel);
+    void setPositionteam(bool Calculate);
     void setTargetAngle(float angle);
-    void setSpeed(int speed);
     void setPosition(int Position);
+    void setSpeed(int speed);
     void setNextPosition();
 
 

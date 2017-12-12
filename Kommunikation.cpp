@@ -86,7 +86,7 @@ void Kommunikation::DataFromPosition(String& comString) {
 		comString += c;
 	}
 
-	Serial.println(comString);
+	//Serial.println(comString);
 
 }
 

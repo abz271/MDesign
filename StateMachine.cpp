@@ -37,6 +37,7 @@ StateMachine::StateMachine() {
 	pinMode(switchPin, INPUT_PULLUP);
 }
 
+
 // Aktualisiert alle Daten aus Odometrie und Kommunikation
 void StateMachine::UpdateData() {
 	Navi.UpdateData();
@@ -51,8 +52,12 @@ void StateMachine::evalStateMachine() {
 			currentState = finishedOutOfTime;
 		}
 	}
+	Navi.setPrePositionteams(true);
+	Navi.setPositionteam(false);
 	switch (currentState) {
 		case initState: {
+
+			Navi.setPositionteam(false);
 			timeToPlay = playTime;
 		}
 			break;
@@ -79,6 +84,8 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 		case driveStraightRegulated: {
+			Navi.setPrePositionteams(false);
+			Navi.setPositionteam(true);
 			Navi.driveToTargetPosition();
 		}
 			break;
@@ -129,7 +136,6 @@ void StateMachine::evalStateMachine() {
 				// Drehung fertig?
 				Navi.setSpeed(speedStartUp);
 				timeLast = timeCur;
-				Navi.setStateInStartUp(true);
 				currentState = startUp;
 				Serial.println("von turnToTargetAngle nach startUp");
 			}
@@ -150,12 +156,10 @@ void StateMachine::evalStateMachine() {
 			if (Navi.getJSON().getStopEnemy() && Navi.DetectedEnemyInArea()) {
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
-				Navi.setStateInStartUp(false);
 				currentState = stopMotor;
 				Serial.println("von startUp nach stopMotor");
 			} else if ((timeCur - timeLast) >= interval) {
 				Navi.setSpeed(150);
-				Navi.setStateInStartUp(false);
 				currentState = driveStraightRegulated;
 				Serial.println("von startUp nach driveStraightRegulated");
 			}
@@ -163,7 +167,12 @@ void StateMachine::evalStateMachine() {
 			break;
 
 		case driveShortlyStraight: {
-			if ((timeCur - timeLast) >= intervalDrive) {
+			if (Navi.getJSON().getStopEnemy()&& Navi.DetectedEnemyInArea()) {
+				Navi.setSpeed(speedStop);
+				timeStop = timeCur;
+				currentState = stopMotor;
+				Serial.println("von driveShortlyStraight nach stopMotor (Gegner erkannt)");
+			}else if ((timeCur - timeLast) >= intervalDrive) {
 				Navi.setSpeed(speedmaxturn);
 				timeLast = timeCur;
 				currentState = nextPoint;
@@ -183,7 +192,7 @@ void StateMachine::evalStateMachine() {
 				timeStop = timeCur;
 				currentState = stopMotor;
 				Serial.println("von driveStraightRegulated nach stopMotor (Ziel erreicht)");
-			} else if (Navi.CrashIncoming()){
+			} else if (Navi.CrashIncoming() && 0){
 				// Zu nah an den Spielplanken
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
@@ -204,7 +213,7 @@ void StateMachine::evalStateMachine() {
 				currentState = finished;
 				Serial.println("von stopMotor nach finished");
 			// Wenn an Position gebremst worden ist, nächste Position anfahren
-			} else if ((Navi.getSpeed() == 0) && (/*!digitalRead(switchPin)*/1))  {
+			} else if ((Navi.getSpeed() == 0) && /*(!digitalRead(switchPin))*/1)  {
 				timeLast = timeCur;
 				Navi.setNextPosition();
 				currentState = nextPoint;
@@ -304,12 +313,12 @@ void StateMachine::evalStateMachine() {
 			Navi.setTargetAngle(actualAvoidAngle);
 
 			// Ausweichsignal war nur kurz da?
-			/*if (!Navi.getJSON().getStopEnemy()){
+			if (!Navi.getJSON().getStopEnemy()){
 				timeLast = timeCur;
 				Navi.setSpeed(speedStartUp);
-				currentState = nextPoint;
+				currentState = startUp;
 			// Warte kurz und handel entsprechend deiner Bestimmung:
-			}else*/ if ((timeCur - timeLast) >= intervalStop) {
+			}else if ((timeCur - timeLast) >= intervalStop) {
 				// Masterfahrzeug: Nach Zeitablauf zu neuem Winkel drehen
 				if (Master) {
 					timeLast = timeCur;
@@ -321,7 +330,7 @@ void StateMachine::evalStateMachine() {
 					if (!Navi.getJSON().getStopEnemy()) {
 						timeLast = timeCur;
 						Navi.setSpeed(speedStartUp);
-						currentState = nextPoint;
+						currentState = startUp;
 						Serial.println("von avoidCrash nach nextPoint (Slave)");
 					}
 				}

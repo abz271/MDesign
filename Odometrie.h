@@ -17,7 +17,7 @@ private:
 
 
     // Rad Geometrie
-    const float radDurchmesserLinks = 52.7;
+    const float radDurchmesserLinks = 52.85;
     const float radUmfangLinks = radDurchmesserLinks * PI;
 
     const float radDurchmesserRechts = 52.7;

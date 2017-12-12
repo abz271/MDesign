@@ -1,8 +1,11 @@
 #include "Odometrie.h"
 #include "Navigation.h"
 #include "Motor.h"
+#include "Gerade.h"
+#include "Vec.h"
 #include <Arduino.h>
 
+float angle = 0;
 
 Navigation::Navigation(){
 	Position = 0;
@@ -29,7 +32,6 @@ void Navigation::UpdateData() {
 	// Rohe Positionsdaten
 	float xPosiZumPlotten, yPosiZumPlotten;		// nachher wieder weg
 	int WertOk = JSON.getPosition(xPosiZumPlotten, yPosiZumPlotten);
-	JSON.getPosition(xPosiZumPlotten, yPosiZumPlotten);
 
 	// Positionsdaten
 	float xZusammenPlotten, yZusammenPlotten; // nachher weg
@@ -37,14 +39,16 @@ void Navigation::UpdateData() {
 	// bei start up schon erlauben, dass Daten �berschrieben werden, aber nicht gesetzt werden => Odometrie fahren
 	// Grund: Keine Ausrei�er beim Fahren 0,0 auf x,x => Falscher Winkel
 	if (StateStartUp){
-		x_PositionteamOld = int (xFromPosition);
-		y_PositionteamOld = int (yFromPosition);
-		x_PositionteamNew = int (xFromPosition);
-		y_PositionteamNew = int (yFromPosition);
+		if (JSON.getPosition(xFromPosition, yFromPosition)){
+			x_PositionteamOld = int (xFromPosition);
+			y_PositionteamOld = int (yFromPosition);
+			x_PositionteamNew = int (xFromPosition);
+			y_PositionteamNew = int (yFromPosition);
+		}
 	}
 
 	// Daten von Positionteam sind gut
-	if (JSON.getPosition(xFromPosition, yFromPosition)){
+	if (JSON.getPosition(xFromPosition, yFromPosition) && takePosition && 0){
 
 		// Daten von Positionteam sind die gleichen? => nur 5 Hz Taktung
 		if((x_PositionteamOld == x_PositionteamNew) && (y_PositionteamOld == y_PositionteamNew)) {
@@ -63,8 +67,8 @@ void Navigation::UpdateData() {
 			if ((x_PositionteamOld != x_PositionteamNew) && (y_PositionteamOld != y_PositionteamNew)){
 				int deltaX = x_PositionteamNew - x_PositionteamOld;
 				int deltaY = y_PositionteamNew - y_PositionteamOld;
-				float angle = atan2(deltaY, deltaX) * 180/PI;	// evtl ( 0 , 0 ) abfangen
-				Odo.setAngle(angle);
+				angle = atan2(deltaY, deltaX) * 180/PI;	// evtl ( 0 , 0 ) abfangen
+				//Odo.setAngle(angle*0.5+Odo.getAngle()*0.5);
 			}
 		}
 		// Falls beide Winkel unterschiedlich sind, alten Winkel zuweisen
@@ -77,31 +81,54 @@ void Navigation::UpdateData() {
 		x_PositionteamNew = int(xFromPosition);
 		y_PositionteamNew = int(yFromPosition);
 
+		//x_aktuell = Odo.getX_position();
+		//y_aktuell = Odo.getY_position();
+
+
+
 
 
 		// Daten von Positionteam sind schlecht
 	} else {
+		xZusammenPlotten = Odo.getX_position();
+		yZusammenPlotten = Odo.getY_position();
+
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
 		x_PositionteamOld = x_PositionteamNew;
 		y_PositionteamOld = y_PositionteamNew;
 	}
-	Odo.testOdometrie();
+	//Odo.testOdometrie();
 
-	Serial.println(Odo.getX_position());
-	Serial.println(" ");
+	Serial.print(Odo.getX_position());
+	Serial.print(" ");
 	Serial.println(Odo.getY_position());
-	Serial.println(" ");
-	Serial.println(xPosiZumPlotten);
-	Serial.println(" ");
-	Serial.println(yPosiZumPlotten);
-	Serial.println(" ");
-	Serial.println(WertOk);
-	Serial.println(" ");
-	Serial.println(xZusammenPlotten);
-	Serial.println(" ");
-	Serial.println(yZusammenPlotten);
-	Serial.println(" ");
+/*
+	Serial.print(" ");
+	Serial.print(xPosiZumPlotten);
+	Serial.print(" ");
+	Serial.print(yPosiZumPlotten);
+	Serial.print(" ");
+	Serial.print(WertOk);
+	Serial.print(" ");
+	Serial.print(xZusammenPlotten);
+	Serial.print(" ");
+	Serial.print(yZusammenPlotten);
+	Serial.print(" ");
+	Serial.print(angle);
+	Serial.print(" ");
+	Serial.print(Odo.getAngle());
+	Serial.print(" ");
+	Serial.print("x_PositionteamOld: ");
+	Serial.print(x_PositionteamOld);
+	Serial.print(" ");
+	Serial.print(x_PositionteamNew);
+	Serial.print(" ");
+	Serial.print("y_PositionteamOld: ");
+	Serial.print(y_PositionteamOld);
+	Serial.print(" ");
+	Serial.println(y_PositionteamNew);
+*/
 
 }
 
@@ -171,7 +198,7 @@ void Navigation::turnToTargetAngle() {
 void Navigation::driveToTargetPosition(){
 	e = getLengthToPosition(X_Koordinaten[Position], Y_Koordinaten[Position]);
 	// implementierung P-Regler
-	Serial.println(e);
+	//Serial.println(e);
 	controlDeviation = getTargetAngle();	// Soll Winkel
 	actualDeviation = Odo.getAngle();		// Ist Winkel
 	//Reglerdifferenz verstärken und übertragen
@@ -281,7 +308,7 @@ void Navigation::setNextPosition(){
 	Position ++;
 }
 
-void Navigation::setStateInStartUp(bool StateStartUp){
+void Navigation::setPrePositionteams(bool StateStartUp){
 	this->StateStartUp = StateStartUp;
 }
 
@@ -292,6 +319,10 @@ void Navigation::setStartParameters(int x, int y, float angle){
 	Odo.setXposition(x);
 	Odo.setYposition(y);
 	Odo.setAngle(angle);
+}
+
+void Navigation::setPositionteam(bool Calculate){
+	takePosition = Calculate;
 }
 
 // Gibt Vorzeichen des übergebenen Wertes zurück

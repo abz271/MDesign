@@ -16,11 +16,6 @@ void setup() {
 
 
 void loop() {
-	unsigned long test1 = millis();
-	//if (millis() - lastTime >= 5){
 		StateM.UpdateData();
-		//lastTime = millis();
 		StateM.evalStateMachine();
-	//}
-	Serial.println( millis()- test1);
 }

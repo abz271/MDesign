@@ -75,7 +75,14 @@ void Motor::turn(float velocity) {
 	nextVelocityPwmRight = abs(velocity);
 }
 
-
+void Motor::driveBack(){
+	digitalWrite(in1, HIGH);
+	digitalWrite(in2, LOW);
+	digitalWrite(in3, HIGH);
+	digitalWrite(in4, LOW);
+	nextVelocityPwmLeft = 255;
+	nextVelocityPwmRight = 255;
+}
 
 
 
