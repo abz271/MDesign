@@ -13,6 +13,7 @@ private:
     Odometrie Odo;
     Motor Moto;
 private:
+    bool StateStartUp = false;
 
     // Attribute für die Motoransteuerung
     float speed = 100;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
@@ -49,6 +50,7 @@ public:	// Allgemeines
     void turnToTargetAngle();
     void driveToTargetPosition();
     bool DetectedEnemyInArea();
+    bool CrashIncoming();
     Odometrie& getOdometrie();
     Kommunikation& getJSON();
     Motor& getMotor();
@@ -71,6 +73,7 @@ public: // Getter
 
 public:	// Setter
     void setStartParameters(int x, int y, float angle);
+    void setStateInStartUp(bool StateStartup);
     void setDirection(float odo, float ziel);
     void setTargetAngle(float angle);
     void setSpeed(int speed);

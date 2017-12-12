@@ -35,6 +35,7 @@ public:
 	void UpdateData();
 	void applyOutputToProcess();
 
+
 	Navigation& getNavigation();
 
 };

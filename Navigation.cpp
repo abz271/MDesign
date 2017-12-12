@@ -26,32 +26,83 @@ void Navigation::UpdateData() {
 	Moto.updateVelocity();
 	float xFromPosition, yFromPosition;
 
-	if (/*JSON.getPosition(xFromPosition, yFromPosition)*/ 0 ) {
-		x_aktuell = int(xFromPosition);
-		y_aktuell = int(yFromPosition);
-		Odo.setPosition(x_aktuell, y_aktuell);
+	// Rohe Positionsdaten
+	float xPosiZumPlotten, yPosiZumPlotten;		// nachher wieder weg
+	int WertOk = JSON.getPosition(xPosiZumPlotten, yPosiZumPlotten);
+	JSON.getPosition(xPosiZumPlotten, yPosiZumPlotten);
 
-		if ((x_PositionteamOld != 0) && (y_PositionteamOld != 0)){
-			x_PositionteamNew = x_PositionteamOld;
-			y_PositionteamNew = x_PositionteamOld;
+	// Positionsdaten
+	float xZusammenPlotten, yZusammenPlotten; // nachher weg
+
+	// bei start up schon erlauben, dass Daten überschrieben werden, aber nicht gesetzt werden => Odometrie fahren
+	// Grund: Keine Ausreißer beim Fahren 0,0 auf x,x => Falscher Winkel
+	if (StateStartUp){
+		x_PositionteamOld = int (xFromPosition);
+		y_PositionteamOld = int (yFromPosition);
+		x_PositionteamNew = int (xFromPosition);
+		y_PositionteamNew = int (yFromPosition);
+	}
+
+	// Daten von Positionteam sind gut
+	if (JSON.getPosition(xFromPosition, yFromPosition)){
+
+		// Daten von Positionteam sind die gleichen? => nur 5 Hz Taktung
+		if((x_PositionteamOld == x_PositionteamNew) && (y_PositionteamOld == y_PositionteamNew)) {
+			xZusammenPlotten = Odo.getX_position();
+			yZusammenPlotten = Odo.getY_position();
+
+			x_aktuell = Odo.getX_position();
+			y_aktuell = Odo.getY_position();
+		}else{
+			xZusammenPlotten = int(xFromPosition);
+			yZusammenPlotten = int(yFromPosition);
+
+			x_aktuell = int(xFromPosition);
+			y_aktuell = int(yFromPosition);
+			Odo.setPosition(x_aktuell, y_aktuell);
+			if ((x_PositionteamOld != x_PositionteamNew) && (y_PositionteamOld != y_PositionteamNew)){
+				int deltaX = x_PositionteamNew - x_PositionteamOld;
+				int deltaY = y_PositionteamNew - y_PositionteamOld;
+				float angle = atan2(deltaY, deltaX) * 180/PI;	// evtl ( 0 , 0 ) abfangen
+				Odo.setAngle(angle);
+			}
 		}
-		x_PositionteamOld = x_aktuell;
-		y_PositionteamOld = y_aktuell;
-		if ((x_PositionteamNew != 0) && (y_PositionteamNew != 0)){
-			int deltaX = x_PositionteamNew - x_PositionteamOld;
-			int deltaY = y_PositionteamNew - y_PositionteamOld;
-			float angle = atan2(deltaY, deltaX) * 180/PI;	// evtl ( 0 , 0 ) abfangen
-			Odo.setAngle(angle);
+		// Falls beide Winkel unterschiedlich sind, alten Winkel zuweisen
+		if ((x_PositionteamNew != x_PositionteamOld) && (y_PositionteamNew != y_PositionteamOld)){
+			x_PositionteamOld = x_PositionteamNew;
+			y_PositionteamOld = x_PositionteamNew;
 		}
+
+		// aktualisieren des neuen Winkels
+		x_PositionteamNew = int(xFromPosition);
+		y_PositionteamNew = int(yFromPosition);
+
+
+
+		// Daten von Positionteam sind schlecht
 	} else {
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
-		x_PositionteamOld = 0;
-		y_PositionteamOld = 0;
-		x_PositionteamNew = 0;
-		y_PositionteamNew = 0;
+		x_PositionteamOld = x_PositionteamNew;
+		y_PositionteamOld = y_PositionteamNew;
 	}
 	Odo.testOdometrie();
+
+	Serial.println(Odo.getX_position());
+	Serial.println(" ");
+	Serial.println(Odo.getY_position());
+	Serial.println(" ");
+	Serial.println(xPosiZumPlotten);
+	Serial.println(" ");
+	Serial.println(yPosiZumPlotten);
+	Serial.println(" ");
+	Serial.println(WertOk);
+	Serial.println(" ");
+	Serial.println(xZusammenPlotten);
+	Serial.println(" ");
+	Serial.println(yZusammenPlotten);
+	Serial.println(" ");
+
 }
 
 float Navigation::getCalculateAngle(int x, int y) {
@@ -147,6 +198,32 @@ bool Navigation::DetectedEnemyInArea(){
 	Serial.println(result);
 	return result;
 }
+bool Navigation::CrashIncoming(){
+	bool TooClose = false;
+	int distance = 25;
+
+	Gerade G1(Vec(0, 0), Vec(1, 0));		// G1 und G2 parallel x-Achse
+	Gerade G2(Vec(0, 2000), Vec(1, 0));
+	Gerade G3(Vec(0, 0), Vec(0, 1));		// G3 und G4 parallel y-Achse
+	Gerade G4(Vec(3000, 0), Vec(0, 1));
+
+	// Vektor des Autos anlegen mit gedrehten Richtungsvektor um 90°
+	Vec o(x_aktuell, y_aktuell);
+	Vec r(Odo.getAngle()-90);
+	// Gerade des Autos erzeugen
+	Gerade Intersection(o, r);
+
+	//gedrehter Richtungsvektor: Prüfen ob, Schnittpunkt mit Spielfeldvektoren existieren
+	float a = Intersection.getIntersection(G1);
+	float b = Intersection.getIntersection(G2);
+	float c = Intersection.getIntersection(G3);
+	float d = Intersection.getIntersection(G4);
+
+	if (((a >= 0) && (a < distance)) || ((b >= 0) && (b < distance)) || ((c >= 0) && (c < distance)) || ((d >= 0) && (d < distance))){
+		TooClose = true;
+	}
+	return TooClose;
+}
 
 int Navigation::getTargetCoordinateX(){
 	return X_Koordinaten[Position];
@@ -202,6 +279,10 @@ void Navigation::setTargetAngle(float angle) {
 
 void Navigation::setNextPosition(){
 	Position ++;
+}
+
+void Navigation::setStateInStartUp(bool StateStartUp){
+	this->StateStartUp = StateStartUp;
 }
 
 void Navigation::setPosition(int Position){

@@ -129,6 +129,7 @@ void StateMachine::evalStateMachine() {
 				// Drehung fertig?
 				Navi.setSpeed(speedStartUp);
 				timeLast = timeCur;
+				Navi.setStateInStartUp(true);
 				currentState = startUp;
 				Serial.println("von turnToTargetAngle nach startUp");
 			}
@@ -149,10 +150,12 @@ void StateMachine::evalStateMachine() {
 			if (Navi.getJSON().getStopEnemy() && Navi.DetectedEnemyInArea()) {
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
+				Navi.setStateInStartUp(false);
 				currentState = stopMotor;
 				Serial.println("von startUp nach stopMotor");
 			} else if ((timeCur - timeLast) >= interval) {
 				Navi.setSpeed(150);
+				Navi.setStateInStartUp(false);
 				currentState = driveStraightRegulated;
 				Serial.println("von startUp nach driveStraightRegulated");
 			}
@@ -180,6 +183,12 @@ void StateMachine::evalStateMachine() {
 				timeStop = timeCur;
 				currentState = stopMotor;
 				Serial.println("von driveStraightRegulated nach stopMotor (Ziel erreicht)");
+			} else if (Navi.CrashIncoming()){
+				// Zu nah an den Spielplanken
+				Navi.setSpeed(speedStop);
+				timeStop = timeCur;
+				currentState = stopMotor;
+				Serial.println("von driveStraightRegulated nach stopMotor (Planken zu nah)");
 			}
 		}
 			break;
