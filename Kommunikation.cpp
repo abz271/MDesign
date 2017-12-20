@@ -12,7 +12,6 @@
 Kommunikation::Kommunikation() {
 
 	// Verbindung als Master aufbauen
-	// TODO: fÃ¼r Testzwecke auch als Slave, Adresse einfÃ¼gen
 	Wire.begin();
 
 }
@@ -23,8 +22,6 @@ Kommunikation::Kommunikation() {
  * i^2c Bus Methode
  */
 void Kommunikation::DataFromHardware(String& comString) {
-
-	// TODO: String grÃ¶ÃŸe ermitteln aus funktion
 	// Kommunikation starten, Daten anfragen
 
 	Wire.requestFrom(hardwareAddress, stringLength);
@@ -42,78 +39,55 @@ void Kommunikation::DataFromHardware(String& comString) {
 }
 
 /*
- * Sendet sie Daten fÃ¼r dei Moteren an die Hardware Gruppe
- * i^2c Bus Methode
- */
-
-// TODO: Methode wird nicht mehr genutzt. Kann gelÃ¶scht werden?
-void Kommunikation::DataToHardware(String comString) {
-
-	// Char Array anlegen
-	char charComString[stringLength];
-	comString.toCharArray(charComString, stringLength);
-
-	// Kommunikation beginnen
-	Wire.beginTransmission(hardwareAddress);
-
-	// Daten Ã¼bertragen, als normales Char Array Ã¼bertragen
-	Wire.write(charComString);
-
-	// Kommunikation beenden
-	Wire.endTransmission();
-
-}
-
-/*
  * Fragt die Daten über den i2c Bus von der Positions Gruppe an
  * i2c Methode
  */
-void Kommunikation::DataFromPosition(String& comString) {
-
-	// TODO: String größe ermitteln aus funktion
+void Kommunikation::DataFromPosition(byte* comString) {
 	// Kommunikation starten, Daten anfragen
 
-	Wire.requestFrom(positionAddress, stringLength);
+	Wire.requestFrom(positionAddress, 6);
 
-	// Char array anlegen
-	char c;
-
+	int counter = 0;
 	// Daten einlesen
 	while (Wire.available()) {
-
-		// Chars nacheinander empfangen und in ein char array schreiben
-		c = Wire.read();
-		comString += c;
+		comString[counter] = Wire.read();
+		counter++;
 	}
 
-	//Serial.println(comString);
-
 }
-
 /*
  * Gibt die aktuelle Position der Positionsgruppe per Referenze zurück
  * Außerdem wird ein bool zurück gegeben ob die Information verwendbar ist oder nicht
- * Diese Methode kümmert sich um das Übersetzen des JSONs
  */
-bool Kommunikation::getPosition(float& xPos, float& yPos) {
+bool Kommunikation::getPosition(float& xPos, float& yPos, float& angle) {
+	unsigned long message = 0;
+	unsigned long tmp = 0;
+	unsigned short uangle = 0;
 
-	// Buffer fÃ¼r den Json String
-	StaticJsonBuffer<100> jsonBuffer;
-	String comString;
+	byte comString[6];
 
-	// Daten von dem Positionsteam abfragen
 	DataFromPosition(comString);
+// Bitverkn�pfung, um Daten von Positionsteam zu rekonstruieren
+	tmp = comString[0];
+	message |= (tmp << 24) & 0xFF000000;
+	tmp = comString[1];
+	message |= (tmp << 16) & 0x00FF0000;
+	tmp = comString[2];
+	message |= (tmp <<  8) & 0x0000FF00;
+	tmp = comString[3];
+	message |= (tmp & 0x000000FF);
 
-	// Json Object aus dem Ã¼bergebenen string erstellen
-	JsonObject& root = jsonBuffer.parseObject(comString);
+	tmp = comString[4];
+	uangle |= (tmp << 8) & 0xFF00;
+	tmp = comString[5];
+	uangle |= (tmp & 0x00FF);
 
-	// TODO: Nach Ãœbersetzungsfehler prÃ¼fen
+	xPos = ((message & 0xFFFE0000) >> 17) / 10.0;
+	yPos = ((message & 0x0001FFFC) >>  2) / 10.0;
 
-	// Werte aus dem Json Objekt auslesen und den Ã¼bergebenen Werten zuweisen
-	xPos = root["x"];
-	yPos = root["y"];
-	return root["e"];
+	angle = (uangle / 100.0) - 180.0;
 
+	return message & 0x03;
 }
 
 /*
@@ -143,41 +117,20 @@ bool Kommunikation::getStopEnemy() {
 
 }
 
-/*
- *	Gibt einen Bool zurÃ¼ck, wenn das Signal des Positionsbestimmungsteams gut ist.
- *  Wird in den Funktionen genutzt, um Daten zu aktualisieren und zu kalibrieren
- */
- /*
-bool Kommunikation::getSignalUsefull() {
-	// Buffer fÃ¼r den Json String
-	StaticJsonBuffer<100> jsonBuffer;
-	// Variablen
-	bool result = false;
-	String comString;
-	// Daten von dem Positions-Team abfragen
-	DataFromPosition(comString);
-	// Einen Json String erstellen
-	JsonObject& root = jsonBuffer.parseObject(comString);
-	//Daten in den Json String schreiben
-	result = root["sigOk"];
-	// Return des Ergebnisses
-	return result;
-}
-
-
 void Kommunikation::testKommunikation(){
 	static unsigned long time = millis();
 
 	bool signalOk = false;
 	bool enemyDet = false;
 	float x, y = -1000;
+	float angle;
 
-	signalOk = getPosition(x, y);
+	signalOk = getPosition(x, y, angle);
 
 
 	if(millis() > time + 100){
 		time = millis();
-		 signalOk = getPosition(x, y);
+		 signalOk = getPosition(x, y, angle);
 		 enemyDet = getStopEnemy();
 		 Serial.print("SigOk:  ");
 		 Serial.print(signalOk);
@@ -246,10 +199,8 @@ void Kommunikation::testAsMaster() {
 }
 
 void send() {
-
 	Wire.write("hello i^2c");
 }
-
 
   //Slave testen
   //Der Slave sendet etwas

@@ -11,8 +11,8 @@ private:
     float Achsabstand = 273.0*(360.0/361.0);	// in mm
 
 	// Position
-    float x_odometrie;
-    float y_odometrie;
+    float x_odometrie = 0;
+    float y_odometrie = 0;
     float alpha_odometrie = 90;
 
 
@@ -20,23 +20,26 @@ private:
     const float radDurchmesserLinks = 52.85;
     const float radUmfangLinks = radDurchmesserLinks * PI;
 
-    const float radDurchmesserRechts = 52.7;
+    const float radDurchmesserRechts = 52.70;
     const float radUmfangRechts = radDurchmesserRechts * PI;
 
-    // Encoder sind global, in der cpp definiert definiert
+    // Encoder sind global, in der cpp definiert
     // Rotary Encoder Methoden
 	void getDiffWheelDistance(float& leftWheelChange, float& rightWheelChange);
 	void getDiffWheelAngle(float& leftWheelChange, float& rightWheelChange);
 
 public:
-
     // Nach auﬂen gebrauchte Methoden
     Odometrie();
     void updateOdometrie();
     void setPosition(int x, int y);
+
+    // Getter
+    float getAngle();
     int getX_position();
     int getY_position();
-    float getAngle();
+
+    // Setter
     void setAngle(float alpha_odometrie);
     void setXposition (int x_odometrie);
     void setYposition (int y_odometrie);

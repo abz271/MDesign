@@ -1,17 +1,19 @@
-#include "Arduino.h"
-#include "Navigation.h"
-
 #ifndef STATEMACHINE_H
 #define	STATEMACHINE_H
+
+#include "Arduino.h"
+#include "Navigation.h"
+#include "Gerade.h"
 
 class StateMachine {
 private:
 	Navigation Navi;
 	int switchPin = 52;				// Einschalter
 
-	// Fahrparameter
+	// Geschwindigkeitsfahrparameter
 	int speedmaxturn = 100;
 	int speedStartUp = 45;
+	int speedRegulated = 150;
 	int speedmax = 255;
 	int speedStop = 0;
 
@@ -30,11 +32,11 @@ private:
 
 public:
 
+
 	StateMachine();
 	void evalStateMachine();
 	void UpdateData();
 	void applyOutputToProcess();
-
 
 	Navigation& getNavigation();
 

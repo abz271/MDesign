@@ -36,7 +36,6 @@ public:
     void driveStraight();
     void turn(float velocity);
     void stoppInstantForward(unsigned char velocity);
-    void driveBack();
     void stop();
 };
 

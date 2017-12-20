@@ -1,47 +1,54 @@
-
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
+
+// Includes der Klassenheader
 #include "Kommunikation.h"
 #include "Odometrie.h"
+#include "Gerade.h"
 #include "Motor.h"
-//#include "StateMachine.h"
-
+#include "Vec.h"
 
 class Navigation {
 private:
+	// Klassen anlegen
     Kommunikation JSON;
     Odometrie Odo;
     Motor Moto;
 private:
-    bool StateStartUp = false;
+    bool StateStartUp = false;	// Auskunft über Statemachinenzustand "StartUp"
 
     // Attribute für die Motoransteuerung
     float speed = 100;		// MotorPWM-Signal für die Vorwärtsfahrt eines Rades
-    float targetAngle = 0;	// zum Aktualisieren des Eingeschlagenen Winkel
+    float targetAngle = 0;	// Zielwinkel
     // Attribute für die Positionsbestimmung
-    int X_Koordinaten[5] = {300, 850, 2150, 2790, 300};			// Alpha Fahrzeug Koordinaten
-    int Y_Koordinaten[5] = {1700, 1460, 1460, 200, 1700};		// Alpha Fahrzeug Koordinaten
 
-    //int X_Koordinaten[6] = {2700, 2800, 2700, 1500, 710, 2700};		// Beta Fahrzeug Koordinaten
-    //int Y_Koordinaten[6] = {1700, 1300, 200, 800, 300, 300};		// Beta Fahrzeug Koordinaten
-    int x_aktuell = 0;
-    int y_aktuell = 0;
-    int maxPosition = 4;		// Maximal 5 Positionen; Zählweise ab 0
-    int Position;				// Aktueller Anfahrpunkt
+    int X_Koordinaten[4] = {0, 0, 0, 0};		// Alpha Fahrzeug Koordinaten
+    int Y_Koordinaten[4] = {0, 0, 0, 0};		// Alpha Fahrzeug Koordinaten
 
+    //int X_Koordinaten[6] = {0, 0, 0, 0, 0, 0};		// Beta Fahrzeug Koordinaten
+    //int Y_Koordinaten[6] = {0, 0, 0, 0, 0, 0};		// Beta Fahrzeug Koordinaten
+
+    int maxPosition = 3;		// Maximal anzufahrende Punkte; Arrayzählweise ab 0
+    int Position;				// Variable zum Auswählen der x und y Koordinaten, Startwert 0
+
+    int x_aktuell = 0;			// aktuelle Position des Fahrzeugs [x]
+    int y_aktuell = 0;			// aktuelle Position des Fahrzeugs [y]
+
+
+    // Werte vom Positionsteam
     int x_PositionteamOld = 0;
     int x_PositionteamNew = 0;
     int y_PositionteamOld = 0;
     int y_PositionteamNew = 0;
 
-    bool takePosition = false;
+    bool takePosition = false;		// Werte von Positionsteam übernehmen? Siehe Statemachine
 
     // Reglungswerkzeuge
 	float controlDeviation = 0;		// Sollwert Geradeausfahrt (Drehwinkel)
 	float actualDeviation = 0;		// Istwert Geradeausfahrt (Drehwinkel)
 	float differenceDeviation = 0;	// Differenz Soll-Ist-Winkel Geradeausfahrt
 	float amplifierKp = 10;			// Verstärkungsfaktor
-	float safetyRadius = 30;		// Sicherheitsradius bei anfahren von Punkten
+	float safetyRadius = 23;		// Sicherheitsradius bei anfahren von Punkten
     float e = 0.0;					// Differenz Soll-Ist-Winkel
     float direction = 0;			// Kürzeste Richtung fürs drehen
 

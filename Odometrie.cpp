@@ -7,16 +7,8 @@
 Encoder leftWheel(2, 6);
 Encoder rightWheel(3, 5);
 
+// Konstruktur
 Odometrie::Odometrie() {
-
-	// Die Startposition und der Startwinkel müssen hier festgelegt werden
-	// Diese unterscheiden sich je nach Fahrzeug, sind aber wichtig damit diese korrekt arbeiten
-	// bis jetzt nur Testwerte:
-	x_odometrie = 0;
-	y_odometrie = 0;
-	//alpha_odometrie = 0;
-
-
 }
 
 void Odometrie::setXposition(int x_odometrie){

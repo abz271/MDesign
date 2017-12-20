@@ -1,14 +1,4 @@
 #include "Statemachine.h"
-#include "Navigation.h"
-#include "Gerade.h"
-#include <Arduino.h>
-
-// Allgemeine Todos
-// TODO: Testen: Testen der Odometrie ohne Mopped
-// TODO: Testen: Testen der Odometrie mit Mopped
-// TODO: Testen: Ausweichverhalten ; nach Umbau noch nicht getestet, neu: Lava
-// TODO: Testen: Wenn Zeit: Drehung auf Stelle optimieren
-// TODO: Testen: Kommunikation
 
 enum states {
 	initState,
@@ -45,19 +35,21 @@ void StateMachine::UpdateData() {
 	playTime = millis();
 }
 
+// Statemachine zur Steuerung des Fahrzyklus
 void StateMachine::evalStateMachine() {
+	// Globale Spielzeit definieren
 	if ((playTime - timeToPlay) >= intervalPlaytime){
 		if (currentState != initState){
 			Navi.setSpeed(speedStop);
 			currentState = finishedOutOfTime;
 		}
 	}
-	Navi.setPrePositionteams(true);
-	Navi.setPositionteam(false);
+	Navi.setPrePositionteams(true);			// Case = StartUp => Werte des Positionsteam vorbereiten
+	Navi.setPositionteam(false);			// Keine Koordinaten vom Positionsteam übernehmen
+
+	// switch Case für die Ausgaben
 	switch (currentState) {
 		case initState: {
-
-			Navi.setPositionteam(false);
 			timeToPlay = playTime;
 		}
 			break;
@@ -84,14 +76,14 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 		case driveStraightRegulated: {
-			Navi.setPrePositionteams(false);
-			Navi.setPositionteam(true);
+			Navi.setPrePositionteams(false);		// Werte vom Poisitionsteam nicht mehr vorbereiten (gleichsetzen)
+			Navi.setPositionteam(true);				//  => Werte sind jetzt nutzbar und können überschrieben werden
 			Navi.driveToTargetPosition();
 		}
 			break;
 		case stopMotor: {
-			Navi.getMotor().stoppInstantForward(speedmax);
-			if (timeCur >= timeStop + 40) {
+			Navi.getMotor().stoppInstantForward(speedmax);	// Nothalt einleiten
+			if (timeCur >= timeStop + 40) {					// nach 40ms Motor normal stoppen
 				Navi.setSpeed(speedStop);
 				Navi.getMotor().stop();
 			}
@@ -101,7 +93,7 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 		case finished: {
-			Navi.setTargetAngle(90);
+			Navi.setTargetAngle(270);						// Beim erreichen des Zieles um einen Winkel drehen
 			Navi.turnToTargetAngle();
 		}
 			break;
@@ -111,8 +103,10 @@ void StateMachine::evalStateMachine() {
 			break;
 	}
 	switch (currentState) {
+	// switch Case für Weiterschaltbedingungen
+		// InitState
 		case initState: {
-			if (!digitalRead(switchPin)) {
+			if (!digitalRead(switchPin)) {					// Taster wird abgefragt, um das Programm zu starten
 				timeLast = timeCur;
 				timeToPlay = playTime;
 				currentState = nextPoint;
@@ -121,6 +115,10 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 
+		// Nächsten Punkt anfahren:
+		// Kurzes Interval warten dann:
+		// Zielwinkel berechnen
+		// Zum Zielwinkel drehen
 		case nextPoint: {
 			if ((timeCur - timeLast) >= interval) {
 				Navi.setSpeed(speedmaxturn);
@@ -131,9 +129,11 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 
+		// Sich zum Zielwinkel drehen:
+		// Wenn Drehung abgeschlossen worden ist, Übergang zur Anfahrfahrt
+		// Während der Drehung wird keine Auswertung der Ausweichsensoren gemacht
 		case turnToTargetAngle: {
 			if (Navi.getSpeed() == speedStop) {
-				// Drehung fertig?
 				Navi.setSpeed(speedStartUp);
 				timeLast = timeCur;
 				currentState = startUp;
@@ -141,7 +141,9 @@ void StateMachine::evalStateMachine() {
 			}
 		}
 			break;
-
+		// Zum Ausweichwinkel drehen
+		// Wenn Drehung abgeschlossen worden ist, Übergang zur kurzzeiten Geradeausfahrt
+		// Während der Drehung wird keine Auswertung der Ausweichsensoren gemacht
 		case turnToAvoidTargetAngle: {
 			if (Navi.getSpeed() == speedStop) {
 				// Drehung fertig?
@@ -152,6 +154,10 @@ void StateMachine::evalStateMachine() {
 			}
 		}
 			break;
+		// Anfahrfahrt
+		// Kurzfristig mit geringerer Geschwindigkeiten anfahren als im regulären Betrieb, um starkes Ruckeln zu verhindern
+		// Falls Gegner erkannt und im Spielfeld sich befindet, Motoren sofort stoppen
+		// Falls Anfahrzeit abgelaufen ist, geregelt Geradeausfahrt einleiten
 		case startUp: {
 			if (Navi.getJSON().getStopEnemy() && Navi.DetectedEnemyInArea()) {
 				Navi.setSpeed(speedStop);
@@ -159,13 +165,14 @@ void StateMachine::evalStateMachine() {
 				currentState = stopMotor;
 				Serial.println("von startUp nach stopMotor");
 			} else if ((timeCur - timeLast) >= interval) {
-				Navi.setSpeed(150);
+				Navi.setSpeed(speedRegulated);
 				currentState = driveStraightRegulated;
 				Serial.println("von startUp nach driveStraightRegulated");
 			}
 		}
 			break;
-
+		// Für eine kurze Zeit Geradeausfahrt einleiten
+		// Falls Gegner erkannt und im Spielfeld sich befindet, Motoren sofort stoppen
 		case driveShortlyStraight: {
 			if (Navi.getJSON().getStopEnemy()&& Navi.DetectedEnemyInArea()) {
 				Navi.setSpeed(speedStop);
@@ -180,31 +187,41 @@ void StateMachine::evalStateMachine() {
 			}
 		}
 			break;
+		// Geregelt Geradeausfahrt einleiten, bis Zielradius erreicht wird
+ 		// Falls Gegner erkannt und im Spielfeld sich befindet, Ausweichverhalten einleiten
+		// Falls Fahrzeug zu nah an die Planken heranfahren, Ausweichverhalten einleiten
+		// Falls Fahrzeug im bestimmten Radius innerhalb des Zielpunktes sich befindet, Motoren abschalten
 		case driveStraightRegulated: {
 			if (Navi.getJSON().getStopEnemy()&& Navi.DetectedEnemyInArea()) {
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
-				currentState = stopMotor;
-				Serial.println("von driveStraightRegulated nach stopMotor (Gegner erkannt)");
+				timeLast = timeCur;
+				currentState = avoidCrash;
+				Serial.println("von driveStraightRegulated nach avoidCrash (Gegner erkannt)");
 			} else if (Navi.getDeviation() < Navi.getSafetyRadius()) {
 				// Zielkreis erreicht?
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
 				currentState = stopMotor;
 				Serial.println("von driveStraightRegulated nach stopMotor (Ziel erreicht)");
-			} else if (Navi.CrashIncoming() && 0){
+			} else if (Navi.CrashIncoming() ){
 				// Zu nah an den Spielplanken
 				Navi.setSpeed(speedStop);
 				timeStop = timeCur;
-				currentState = stopMotor;
-				Serial.println("von driveStraightRegulated nach stopMotor (Planken zu nah)");
+				timeLast = timeCur;
+				currentState = avoidCrash;
+				Serial.println("von driveStraightRegulated nach avoidCrash (Planken zu nah)");
 			}
 		}
 			break;
-
+		// Motoren sind ausgeschaltet
+		// Falls ein Gegner erkannt worden ist, Ausweichverhalten einleiten
+		// Falls der letzte Punkt erreicht worden ist, ist die Fahrt beendet
+		// Falls die Motoren aus keinen der obrigen Gründe ausgeschaltet worden sind, nächsten Punkt anfahren
 		case stopMotor: {
 			// Weiterschalten in AvoidCrash
 			if (Navi.getJSON().getStopEnemy()) {
+				timeLast = timeCur;
 				currentState = avoidCrash;
 				Serial.println("von stopMotor nach avoidCrash");
 			// Letzte Position erreicht?
@@ -213,7 +230,7 @@ void StateMachine::evalStateMachine() {
 				currentState = finished;
 				Serial.println("von stopMotor nach finished");
 			// Wenn an Position gebremst worden ist, nächste Position anfahren
-			} else if ((Navi.getSpeed() == 0) && /*(!digitalRead(switchPin))*/1)  {
+			} else if ((Navi.getSpeed() == 0))  {
 				timeLast = timeCur;
 				Navi.setNextPosition();
 				currentState = nextPoint;
@@ -241,7 +258,7 @@ void StateMachine::evalStateMachine() {
 
 			// Vektor des Autos anlegen mit gedrehten Richtungsvektor um 90°
 			Vec o(Navi.getX(), Navi.getY());
-			Vec r(Navi.getOdometrie().getAngle());
+			Vec r(Navi.getOdometrie().getAngle() + 90);
 			// Gerade des Autos erzeugen
 			Gerade Intersection(o, r);
 
@@ -269,6 +286,7 @@ void StateMachine::evalStateMachine() {
 					IntersectionG4.getY());
 
 			// Überprüfen, welcher Schnittpunkt Sinn ergibt und welcher am weitesten entfernt ist
+			// Weit entferntester Schnittpunkt ist die Ausweichroute
 			if ((IntersectionG1.getY() >= 0) && (IntersectionG2.getY() <= 2000)) {
 				if ((IntersectionG1.getX() >= 0)
 						&& (IntersectionG1.getX() <= 3000)) {
@@ -312,13 +330,7 @@ void StateMachine::evalStateMachine() {
 			// Ausweichwinkel abspeichern
 			Navi.setTargetAngle(actualAvoidAngle);
 
-			// Ausweichsignal war nur kurz da?
-			if (!Navi.getJSON().getStopEnemy()){
-				timeLast = timeCur;
-				Navi.setSpeed(speedStartUp);
-				currentState = startUp;
-			// Warte kurz und handel entsprechend deiner Bestimmung:
-			}else if ((timeCur - timeLast) >= intervalStop) {
+			if ((timeCur - timeLast) >= intervalStop) {
 				// Masterfahrzeug: Nach Zeitablauf zu neuem Winkel drehen
 				if (Master) {
 					timeLast = timeCur;
@@ -339,6 +351,7 @@ void StateMachine::evalStateMachine() {
 		}
 			break;
 
+		// Mit erneuter Betätigung des Tasters beginnt eine neue Fahrt
 		case finished: {
 			if (!digitalRead(switchPin)) {
 				timeLast = timeCur;
@@ -349,7 +362,7 @@ void StateMachine::evalStateMachine() {
 			}
 		}
 			break;
-
+		// Mit erneuter Betätigung des Tasters beginnt eine neue Fahrt
 		case finishedOutOfTime: {
 			if ((!digitalRead(switchPin) && (Navi.getSpeed() == 0))) {
 				timeLast = timeCur;

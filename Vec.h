@@ -5,11 +5,11 @@
 class Vec {
 
 public:
-    float x;
-    float y;
-    Vec();
-    Vec(float angle);
-    Vec(float x, float y);
+    float x;				// x Wert des Vektors
+    float y;				// y Wert des Vektors
+    Vec();					// Konstruktor
+    Vec(float angle);		// Konsturktur mit Winkel
+    Vec(float x, float y);	// Konsturktor mit x und y Position
     Vec operator+(Vec v);
     float getLength();
     float getAngle();

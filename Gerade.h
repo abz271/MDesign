@@ -5,9 +5,9 @@
 
 class Gerade {
 public:
-	Vec o;
-	Vec r;
-	float k;
+	Vec o;		// Ortsvektor
+	Vec r;		// Richtungsvektor
+	float k;	// Lambda
 public:
 	Gerade();
 	Gerade(Vec o, Vec r);
@@ -16,7 +16,6 @@ public:
 	float calculateYInterception(float lambda);
 
 	Vec getDirectVec(float i);
-	void testSchnittpunkt();
 };
 
 #endif /* GERADE_H */

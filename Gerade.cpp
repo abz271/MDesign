@@ -6,21 +6,29 @@ Gerade::Gerade() {
 	k = 0;
 }
 
+
+// Gerade anlegen aus Ort- und Richtungsvektor
 Gerade::Gerade(Vec o, Vec r) :
 		o(o), r(r) {
 	k = 0;
 }
 
+// Schnittpunkt zweier Gerade berechnen
+// Übergabewert ist eine Gerade g
+// Rückgabewert ist die Verstärkung Lamdba eines Richtungsvektors, um einen Schnittpunkt zu erhalten
 float Gerade::getIntersection(Gerade g) {
-	float Intersection = 0;
-	Intersection = (g.o.x * g.r.y + o.y * g.r.x - g.o.y * g.r.x - g.r.y * o.x)
+	float Lambda = 0;
+	Lambda = (g.o.x * g.r.y + o.y * g.r.x - g.o.y * g.r.x - g.r.y * o.x)
 			/ (g.r.y * r.x - r.y * g.r.x);
 
-	return Intersection;
+	return Lambda;
 }
 
-Vec Gerade::getDirectVec(float i){
-	Vec result(o.x+i*r.x, o.y+i*r.y);
+// Berechnet einen resultierenden Vektor:
+// Aus aktuellen Ortsvektor und einem mit Lambda multiplizierten Richtungsvektor
+// => Aktuelle Schnittpunktskoordinaten mit einer anderen Geraden kann berechnet werden
+Vec Gerade::getDirectVec(float Lambda){
+	Vec result(o.x+Lambda*r.x, o.y+Lambda*r.y);
 	return result;
 }
 

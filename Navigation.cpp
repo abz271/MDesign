@@ -1,45 +1,36 @@
-#include "Odometrie.h"
 #include "Navigation.h"
-#include "Motor.h"
-#include "Gerade.h"
-#include "Vec.h"
-#include <Arduino.h>
 
-float angle = 0;
-
+// KlassenKonstruktor: Bei Initialisierung wird Zielposition auf 0 gesetzt
+// 					=> Punkt X_Koordinaten[0] Y_Koordinaten[0]
 Navigation::Navigation(){
 	Position = 0;
 }
-
-
+// Getter, der die Referenz auf die in Navigation benutzte Odometrieinstanz wiedergibt
 Odometrie& Navigation::getOdometrie(){
 	return Odo;
 }
-
+// Getter, der die Referenz auf die in Navigation benutzte Motorinstanz wiedergibt
 Motor& Navigation::getMotor(){
 	return Moto;
 }
-
+// Getter, der die Referenz auf die in Navigation benutzte Kommunikatioinstanz wiedergibt
 Kommunikation& Navigation::getJSON(){
 	return JSON;
 }
 
+// Updatemethode:
+// Aktualisiert alle Werte aus der Odometrieberechnung und der Motoransteuerung.
+// Aktuelle Position berechnet sich auf zwei Möglichkeiten:
+// 1 Möglichkeit: Werte von der Positionsbestimmung
+// 2 Möglichkeit: Werte aus der Odometrie
 void Navigation::UpdateData() {
 	Odo.updateOdometrie();
 	Moto.updateVelocity();
-	float xFromPosition, yFromPosition;
-
-	// Rohe Positionsdaten
-	float xPosiZumPlotten, yPosiZumPlotten;		// nachher wieder weg
-	int WertOk = JSON.getPosition(xPosiZumPlotten, yPosiZumPlotten);
-
-	// Positionsdaten
-	float xZusammenPlotten, yZusammenPlotten; // nachher weg
-
-	// bei start up schon erlauben, dass Daten überschrieben werden, aber nicht gesetzt werden => Odometrie fahren
+	float xFromPosition, yFromPosition, angleFromPosition;
+	// beim Case startUp schon erlauben, dass Daten aus der Position übernehmen, aber nicht x_aktuell und y_aktuell gesetzt werden => Odometrie fahren
 	// Grund: Keine Ausreißer beim Fahren 0,0 auf x,x => Falscher Winkel
 	if (StateStartUp){
-		if (JSON.getPosition(xFromPosition, yFromPosition)){
+		if (JSON.getPosition(xFromPosition, yFromPosition, angleFromPosition)){
 			x_PositionteamOld = int (xFromPosition);
 			y_PositionteamOld = int (yFromPosition);
 			x_PositionteamNew = int (xFromPosition);
@@ -48,90 +39,43 @@ void Navigation::UpdateData() {
 	}
 
 	// Daten von Positionteam sind gut
-	if (JSON.getPosition(xFromPosition, yFromPosition) && takePosition && 0){
+	if (JSON.getPosition(xFromPosition, yFromPosition, angleFromPosition) && takePosition){
 
-		// Daten von Positionteam sind die gleichen? => nur 5 Hz Taktung
+		// Sind die Daten vom Positionteam die gleichen?
+		// Grund: Positionsteam taktet nur mit 5 Hz, Odometrie mit max. Arduinogeschw.
+		// => Odometrie werte nehmen
+		// Falls ungleich: Positionswerte nehmen und Odometriewerte überschreiben
 		if((x_PositionteamOld == x_PositionteamNew) && (y_PositionteamOld == y_PositionteamNew)) {
-			xZusammenPlotten = Odo.getX_position();
-			yZusammenPlotten = Odo.getY_position();
-
 			x_aktuell = Odo.getX_position();
 			y_aktuell = Odo.getY_position();
 		}else{
-			xZusammenPlotten = int(xFromPosition);
-			yZusammenPlotten = int(yFromPosition);
-
 			x_aktuell = int(xFromPosition);
 			y_aktuell = int(yFromPosition);
 			Odo.setPosition(x_aktuell, y_aktuell);
-			if ((x_PositionteamOld != x_PositionteamNew) && (y_PositionteamOld != y_PositionteamNew)){
-				int deltaX = x_PositionteamNew - x_PositionteamOld;
-				int deltaY = y_PositionteamNew - y_PositionteamOld;
-				angle = atan2(deltaY, deltaX) * 180/PI;	// evtl ( 0 , 0 ) abfangen
-				//Odo.setAngle(angle*0.5+Odo.getAngle()*0.5);
 			}
-		}
-		// Falls beide Winkel unterschiedlich sind, alten Winkel zuweisen
+		// Falls beide Punte unterschiedlich sind, Neue Werte in alte Werte schreiben
 		if ((x_PositionteamNew != x_PositionteamOld) && (y_PositionteamNew != y_PositionteamOld)){
 			x_PositionteamOld = x_PositionteamNew;
 			y_PositionteamOld = x_PositionteamNew;
 		}
 
-		// aktualisieren des neuen Winkels
+		// aktualisieren des neuen Punktes
 		x_PositionteamNew = int(xFromPosition);
 		y_PositionteamNew = int(yFromPosition);
 
-		//x_aktuell = Odo.getX_position();
-		//y_aktuell = Odo.getY_position();
-
-
-
-
-
 		// Daten von Positionteam sind schlecht
+		// => Nur mit Odometrie fahren
 	} else {
-		xZusammenPlotten = Odo.getX_position();
-		yZusammenPlotten = Odo.getY_position();
-
 		x_aktuell = Odo.getX_position();
 		y_aktuell = Odo.getY_position();
+
 		x_PositionteamOld = x_PositionteamNew;
 		y_PositionteamOld = y_PositionteamNew;
 	}
-	//Odo.testOdometrie();
-
-	Serial.print(Odo.getX_position());
-	Serial.print(" ");
-	Serial.println(Odo.getY_position());
-/*
-	Serial.print(" ");
-	Serial.print(xPosiZumPlotten);
-	Serial.print(" ");
-	Serial.print(yPosiZumPlotten);
-	Serial.print(" ");
-	Serial.print(WertOk);
-	Serial.print(" ");
-	Serial.print(xZusammenPlotten);
-	Serial.print(" ");
-	Serial.print(yZusammenPlotten);
-	Serial.print(" ");
-	Serial.print(angle);
-	Serial.print(" ");
-	Serial.print(Odo.getAngle());
-	Serial.print(" ");
-	Serial.print("x_PositionteamOld: ");
-	Serial.print(x_PositionteamOld);
-	Serial.print(" ");
-	Serial.print(x_PositionteamNew);
-	Serial.print(" ");
-	Serial.print("y_PositionteamOld: ");
-	Serial.print(y_PositionteamOld);
-	Serial.print(" ");
-	Serial.println(y_PositionteamNew);
-*/
-
 }
 
+
+// Berechnung des Winkels zwischen der aktuellen Position und der Zielposition
 float Navigation::getCalculateAngle(int x, int y) {
 
 	double delta_x = x - x_aktuell;
@@ -140,65 +84,31 @@ float Navigation::getCalculateAngle(int x, int y) {
 
 	return Winkel;
 }
-// TODO: Evtl nicht mehr genutzt
-bool Navigation::PositionInLava(){
-	bool Lava = false;
-	int Lavabereich = 300;
-	if (((x_aktuell >= 0) && (x_aktuell <= Lavabereich)) ){
-		if ((y_aktuell >= 0) && (y_aktuell <= 2000)){
-			Lava = true;
-		}
-	}
-	if (((x_aktuell >= 3000-Lavabereich) && (x_aktuell <= 3000))){
-		if ((y_aktuell >= 0) && (y_aktuell <= 2000)){
-			Lava = true;
-		}
-	}
-	if((x_aktuell >= Lavabereich) && (x_aktuell <= 3000-Lavabereich)){
-		if ((y_aktuell >= 2000-Lavabereich) && (y_aktuell <= 2000)){
-			Lava = true;
-		}
-	}
-	if ((x_aktuell >= Lavabereich) && (x_aktuell <= 3000-Lavabereich)){
-		if ((y_aktuell >= 0) && (y_aktuell <= Lavabereich)){
-			Lava = true;
-		}
-	}
-
-	return Lava;
-}
 // Berechnet die VektorlÃƒÂ¤nge zwischen dem aktuellem Standort und dem Zielpunkt.
-// Wird evtl nicht mehr gebraucht
 float Navigation::getLengthToPosition(int x, int y) {
 	int delta_x = x - x_aktuell;
 	int delta_y = y - y_aktuell;
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
 }
 
+// Sich zum Zielwinkel drehen
 void Navigation::turnToTargetAngle() {
-	e = targetAngle - Odo.getAngle();
-	Moto.turn(signum(e) * speed);
-	Serial.print("  targetAngle: ");
-	Serial.print(targetAngle);
-	Serial.print("  OdoAngle: ");
-	Serial.print(Odo.getAngle());
-	Serial.print(" speed: ");
-	Serial.print(speed);
-	Serial.print(" e: ");
-	Serial.println(e);
-	if (abs(e) < 50){
-		//speed --;		//Originalversion
-		speed = speed - 5;
+	e = targetAngle - Odo.getAngle();	// Differenz zwischen Zielwinkel und Odometriewinkel
+	Moto.turn(signum(e) * speed);		// Motordrehung initialisieren => Bei Vorzeichenwechsel Drehwechsel!
+	if (abs(e) < 50){					// Differenz geringer als 50?
+		speed -= 5;						// Geschwindigkeit der Motoren runtersetzen
 		if (speed <= 0){
 			Moto.stop();
 		}
 	}
 }
 
+
+// Zum Zielpunkt fahren
+// Implementiert als P-Regler, der die Motorgeschwindigkeit auf beiden Rädern ändert(Abhängig von der Abweichung)
 void Navigation::driveToTargetPosition(){
 	e = getLengthToPosition(X_Koordinaten[Position], Y_Koordinaten[Position]);
-	// implementierung P-Regler
-	//Serial.println(e);
+	// Implementierung P-Regler
 	controlDeviation = getTargetAngle();	// Soll Winkel
 	actualDeviation = Odo.getAngle();		// Ist Winkel
 	//Reglerdifferenz verstÃ¤rken und Ã¼bertragen
@@ -206,6 +116,10 @@ void Navigation::driveToTargetPosition(){
 	Moto.driveStraightRegulated(speed, differenceDeviation);
 }
 
+// Positionserkennung:
+// Ist der detektierte Gegenstand im Spielfeld
+// Hintergrund: Im Lastenheft sind keine Gegenstande außer das zweite Fahrzeug im Spielfeld
+// => Gegenstände am Rand ausblendbar
 bool Navigation::DetectedEnemyInArea(){
 	int xPositionObject = 0;
 	int yPositionObject = 0;
@@ -217,30 +131,27 @@ bool Navigation::DetectedEnemyInArea(){
 	if (((xPositionObject > 0) && (xPositionObject < 3000)) && ((yPositionObject > 0) && (yPositionObject < 2000))){
 		result = true;
 	}
-	Serial.print("x:  ");
-	Serial.println(xPositionObject);
-	Serial.print("y:  ");
-	Serial.println(yPositionObject);
-	Serial.print("Ergebnis: Objekt im Gebiet:  ");
-	Serial.println(result);
 	return result;
 }
+
+// Erkennung Crash mit Spielfeldrändern
+// Falls die Entfernung zum Sp
 bool Navigation::CrashIncoming(){
 	bool TooClose = false;
-	int distance = 25;
+	int distance = 180;		// Fahrzeug Radius von 150, maximale Genauigkeit 30 mm vom Spielfeldrand
 
 	Gerade G1(Vec(0, 0), Vec(1, 0));		// G1 und G2 parallel x-Achse
 	Gerade G2(Vec(0, 2000), Vec(1, 0));
 	Gerade G3(Vec(0, 0), Vec(0, 1));		// G3 und G4 parallel y-Achse
 	Gerade G4(Vec(3000, 0), Vec(0, 1));
 
-	// Vektor des Autos anlegen mit gedrehten Richtungsvektor um 90°
+	// Richtungs- und Ortsvektor des Autos anlegen
 	Vec o(x_aktuell, y_aktuell);
-	Vec r(Odo.getAngle()-90);
+	Vec r(Odo.getAngle());
 	// Gerade des Autos erzeugen
 	Gerade Intersection(o, r);
 
-	//gedrehter Richtungsvektor: Prüfen ob, Schnittpunkt mit Spielfeldvektoren existieren
+	//Prüfen ob, Schnittpunkt mit Spielfeldvektoren existieren
 	float a = Intersection.getIntersection(G1);
 	float b = Intersection.getIntersection(G2);
 	float c = Intersection.getIntersection(G3);
